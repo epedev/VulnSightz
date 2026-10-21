@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ metadata.report_title }} — VulnSight</title>
+  <style>
+    :root {
+      --bg: #eef3f2;
+      --ink: #0c1b22;
+      --muted: #5b737c;
+      --line: rgba(15, 76, 92, 0.14);
+      --brand: #0f4c5c;
+      --accent: #1faa9a;
+      --amber: #e8a317;
+      --card: rgba(255,255,255,0.88);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(800px 360px at 0% 0%, rgba(31,170,154,0.14), transparent 55%),
+        radial-gradient(700px 300px at 100% 0%, rgba(232,163,23,0.12), transparent 50%),
+        var(--bg);
+      line-height: 1.55;
+    }
+    a { color: var(--brand); }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 1.25rem 1.25rem 4rem; }
+    .topnav {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; flex-wrap: wrap; gap: 0.65rem 1rem; align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+      background: rgba(238,243,242,0.88);
+      border-bottom: 1px solid var(--line);
+      padding: 0.65rem 0; margin-bottom: 1rem;
+    }
+    .brand {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-weight: 700; letter-spacing: 0.08em; font-size: 0.82rem; color: var(--brand);
+    }
+    .topnav a { text-decoration: none; font-size: 0.88rem; color: var(--muted); }
+    .topnav a:hover { color: var(--brand); }
+    header.cover {
+      background: linear-gradient(135deg, #0f4c5c, #0b2f38);
+      color: #f4fbfa;
+      padding: clamp(1.6rem, 4vw, 2.4rem);
+      margin-bottom: 1.25rem;
+      position: relative; overflow: hidden;
+    }
+    header.cover::after {
+      content: ""; position: absolute; right: -40px; bottom: -60px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,163,23,0.28), transparent 70%);
+    }
+    header.cover .product {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.75rem;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber);
+      margin-bottom: 0.55rem;
+    }
+    header.cover h1 { margin: 0 0 0.85rem; font-size: clamp(1.5rem, 3.5vw, 2rem); letter-spacing: -0.02em; }
+    .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.65rem; position: relative; z-index: 1; }
+    .meta div { background: rgba(255,255,255,0.08); padding: 0.65rem 0.8rem; }
+    .meta dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.75; }
+    .meta dd { margin: 0.15rem 0 0; font-weight: 650; word-break: break-word; }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 1.2rem 1.35rem;
+      margin-bottom: 1.1rem;
+    }
+    h2 { margin-top: 0; color: var(--brand); font-size: 1.2rem; letter-spacing: -0.01em; }
+    h3 { margin-bottom: 0.35rem; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.7rem; }
+    .card {
+      border: 1px solid var(--line);
+      padding: 0.85rem;
+      background: #fbfcfd;
+      transition: transform 0.15s ease;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card .num { font-size: 1.55rem; font-weight: 750; color: var(--brand); font-variant-numeric: tabular-nums; }
+    .card .lbl { color: var(--muted); font-size: 0.82rem; }
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+      margin: 0.85rem 0 1rem;
+    }
+    .chip {
+      border: 1px solid var(--line); background: #fff; color: var(--ink);
+      padding: 0.35rem 0.7rem; font-size: 0.8rem; cursor: pointer;
+    }
+    .chip[aria-pressed="true"] { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .dl-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    #dl-status { margin-left: 0.35rem; font-size: 0.8rem; }
+    .search {
+      flex: 1 1 180px; min-width: 160px;
+      border: 1px solid var(--line); padding: 0.45rem 0.65rem; font: inherit;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { border-bottom: 1px solid var(--line); padding: 0.55rem 0.4rem; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    tr.finding-row { cursor: pointer; }
+    tr.finding-row:hover { background: rgba(31,170,154,0.06); }
+    tr.finding-row[hidden] { display: none; }
+    .badge {
+      display: inline-block; min-width: 4.2rem; text-align: center;
+      padding: 0.15rem 0.5rem; font-size: 0.72rem; font-weight: 750; color: #fff;
+      text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .sev-critical { background: #8b1e1e; }
+    .sev-high { background: #c2410c; }
+    .sev-medium { background: #b45309; }
+    .sev-low { background: #1d4ed8; }
+    .sev-info, .sev-none { background: #475569; }
+    .finding {
+      border: 1px solid var(--line); padding: 1rem; margin-top: 0.85rem;
+      background: #fff; scroll-margin-top: 4rem;
+    }
+    .finding[hidden] { display: none; }
+    .muted { color: var(--muted); }
+    pre, code { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.84rem; }
+    pre {
+      background: #0b1c22; color: #d7ebe7; padding: 0.85rem;
+      overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+    }
+    ul.compact { margin: 0.4rem 0; padding-left: 1.2rem; }
+    .notice {
+      background: rgba(232,163,23,0.14); border-left: 4px solid var(--amber);
+      color: #5c4300; padding: 0.75rem 0.9rem; margin-bottom: 1rem;
+    }
+    .downloads {
+      display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center;
+      margin: 0 0 1rem; padding: 0.75rem 0.9rem;
+      background: rgba(255,255,255,0.88); border: 1px solid var(--line);
+    }
+    .downloads .label { color: var(--muted); font-size: 0.85rem; margin-right: 0.25rem; }
+    .dl-btn {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      border: 1px solid var(--line); background: #fff; color: var(--brand);
+      padding: 0.4rem 0.75rem; font-size: 0.85rem; font-weight: 650;
+      text-decoration: none; cursor: pointer;
+    }
+    .dl-btn:hover { border-color: var(--accent); color: var(--accent); }
+    footer { color: var(--muted); font-size: 0.85rem; margin-top: 1rem; }
+    @media print {
+      .topnav, .toolbar { display: none !important; }
+      body { background: #fff; }
+      section, .finding { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topnav">
+      <div class="brand">VULNSIGHT REPORT</div>
+      <div>
+        <a href="#executive-summary">Summary</a> ·
+        <a href="#owasp-top10">OWASP Top 10</a> ·
+        <a href="#findings-overview">Overview</a> ·
+        <a href="#detailed-findings">Details</a> ·
+        <a href="#assessment-quality">Quality</a>
+      </div>
+    </div>
+
+    <header class="cover">
+      <div class="product">VulnSight · see the weakness · prove the risk</div>
+      <h1>{{ metadata.report_title }}</h1>
+      <div class="meta">
+        <div><dt>Target</dt><dd>{{ metadata.target }}</dd></div>
+        <div><dt>Authorized origin</dt><dd>{{ metadata.authorized_origin }}</dd></div>
+        <div><dt>Assessment date</dt><dd>{{ metadata.assessment_date }}</dd></div>
+        <div><dt>Generated (UTC)</dt><dd>{{ metadata.generated_at }}</dd></div>
+        <div><dt>Scan ID</dt><dd>{{ metadata.scan_id }}</dd></div>
+        <div><dt>Scanner version</dt><dd>{{ metadata.scanner_version }}</dd></div>
+      </div>
+    </header>
+
+    <div class="downloads" role="region" aria-label="Download report">
+      <span class="label">Download:</span>
+      <button class="dl-btn" type="button" id="dl-pdf"
+        data-href="{{ artifact_links.get('pdf', 'vulnsight_report.pdf') }}"
+        {% if not artifact_links.get('pdf_available', True) %}disabled title="PDF was not generated for this run"{% endif %}>PDF</button>
+      <button class="dl-btn" type="button" id="dl-md-file"
+        data-href="{{ artifact_links.get('md', 'vulnsight_report.md') }}">Markdown (.md)</button>
+      <button class="dl-btn" type="button" id="dl-md-inline">Markdown (this page)</button>
+      <button class="dl-btn" type="button" id="dl-json"
+        data-href="{{ artifact_links.get('json', 'normalized_findings.json') }}">JSON</button>
+      <a class="dl-btn" href="#findings-overview">Findings table</a>
+      <span class="muted" id="dl-status" aria-live="polite"></span>
+    </div>
+    <script type="application/json" id="md-source">{{ markdown_source|tojson }}</script>
+
+    {% if incomplete %}
+    <div class="notice" role="status">
+      <strong>Incomplete assessment:</strong> one or more inputs failed validation or listed modules were not executed.
+      Do not treat this report as a complete security assessment.
+    </div>
+    {% endif %}
+
+    <section id="executive-summary">
+      <h2>Executive summary</h2>
+      <div class="cards">
+        <div class="card"><div class="num">{{ summary.total_unique_findings }}</div><div class="lbl">Unique findings</div></div>
+        <div class="card"><div class="num">{{ summary.highest_cvss_score if summary.highest_cvss_score is not none else '—' }}</div><div class="lbl">Highest CVSS</div></div>
+        <div class="card"><div class="num">{{ summary.by_verification_status.get('confirmed', 0) }}</div><div class="lbl">Confirmed</div></div>
+        <div class="card"><div class="num">{{ summary.by_verification_status.get('probable', 0) }}</div><div class="lbl">Probable</div></div>
+        <div class="card"><div class="num">{{ summary.by_verification_status.get('candidate', 0) }}</div><div class="lbl">Candidates</div></div>
+        <div class="card"><div class="num">{{ summary.unscored_findings }}</div><div class="lbl">Unscored</div></div>
+      </div>
+      <h3>Severity counts</h3>
+      <ul class="compact">
+        {% for sev, count in summary.by_severity.items() %}
+        <li>{{ sev }}: {{ count }}</li>
+        {% else %}
+        <li class="muted">No findings.</li>
+        {% endfor %}
+      </ul>
+      <h3>By source module</h3>
+      <ul class="compact">
+        {% for mod, count in summary.by_source_module.items() %}
+        <li>{{ mod }}: {{ count }}</li>
+        {% endfor %}
+      </ul>
+      <h3>Major observations</h3>
+      <ul class="compact">
+        {% for obs in summary.major_observations %}
+        <li>{{ obs }}</li>
+        {% else %}
+        <li class="muted">No major observations.</li>
+        {% endfor %}
+      </ul>
+      {% if summary.total_unique_findings == 0 %}
+      <div class="notice" role="status">
+        <strong>No findings reported</strong> for the modules that ran.
+        This is not a certification of security and does not mean the target is safe.
+      </div>
+      {% endif %}
+      <p class="muted">Scope: {{ metadata.scope }}</p>
+      <p class="muted">{{ metadata.purpose }}</p>
+    </section>
+
+    {% if summary.owasp_top10 %}
+    <section id="owasp-top10">
+      <h2>OWASP Top 10:2025 coverage</h2>
+      <p class="muted">
+        {{ summary.owasp_top10.standard }}
+        {% if summary.owasp_top10.edition_window %}
+        · {{ summary.owasp_top10.edition_window }} cycle
+        {% endif %}
+      </p>
+      <p class="muted">{{ summary.owasp_top10.note }}</p>
+      <p>
+        Categories with findings:
+        <strong>{{ summary.owasp_top10.categories_with_findings }}</strong>
+        / {{ summary.owasp_top10.categories_tracked }}
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Category</th>
+            <th>Findings</th>
+            <th>Status</th>
+            <th>VulnSight coverage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in summary.owasp_top10.categories %}
+          <tr>
+            <td><code>{{ row.id }}</code></td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.findings }}</td>
+            <td>{{ row.status.replace('_', ' ') }}</td>
+            <td class="muted">{{ row.vulnsight_coverage }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if summary.owasp_top10.legacy_2021 %}
+      <h3>Legacy OWASP Top 10:2021 continuity</h3>
+      <p class="muted">{{ summary.owasp_top10.legacy_2021.note }}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Category</th>
+            <th>Findings</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in summary.owasp_top10.legacy_2021.categories %}
+          <tr>
+            <td><code>{{ row.id }}</code></td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.findings }}</td>
+            <td>{{ row.status.replace('_', ' ') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <section id="findings-overview">
+      <h2>Findings overview</h2>
+      <div class="toolbar" role="toolbar" aria-label="Filter findings">
+        <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-filter="critical" aria-pressed="false">Critical</button>
+        <button type="button" class="chip" data-filter="high" aria-pressed="false">High</button>
+        <button type="button" class="chip" data-filter="medium" aria-pressed="false">Medium</button>
+        <button type="button" class="chip" data-filter="low" aria-pressed="false">Low</button>
+        <input class="search" id="find-search" type="search" placeholder="Filter by title, URL, CWE…" aria-label="Search findings">
+      </div>
+      <p class="muted" id="filter-count"></p>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Severity</th>
+            <th>CVSS</th>
+            <th>Verification</th>
+            <th>URL</th>
+            <th>Param</th>
+            <th>CWE</th>
+            <th>OWASP</th>
+            <th>Module</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in findings %}
+          <tr class="finding-row" data-severity="{{ f.severity }}" data-search="{{ (f.title ~ ' ' ~ f.url ~ ' ' ~ (f.cwe or '') ~ ' ' ~ (f.owasp or '') ~ ' ' ~ f.source_module)|lower }}" data-target="finding-{{ f.id }}">
+            <td><a href="#finding-{{ f.id }}">{{ f.id[:8] }}</a></td>
+            <td>{{ f.title }}</td>
+            <td><span class="badge sev-{{ f.severity }}">{{ f.severity }}</span></td>
+            <td>{% if f.cvss_base_score is not none %}{{ '%.1f'|format(f.cvss_base_score) }}{% else %}—{% endif %}</td>
+            <td>{{ f.verification_status }}</td>
+            <td>{{ f.url }}</td>
+            <td>{{ f.parameter or '—' }}</td>
+            <td>{{ f.cwe or '—' }}</td>
+            <td>{{ f.owasp or '—' }}</td>
+            <td>{{ f.source_module }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="10" class="muted">No findings to display.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section id="detailed-findings">
+      <h2>Detailed findings</h2>
+      {% for f in findings %}
+      <article class="finding" id="finding-{{ f.id }}" data-severity="{{ f.severity }}" data-search="{{ (f.title ~ ' ' ~ f.url ~ ' ' ~ (f.cwe or '') ~ ' ' ~ (f.owasp or '') ~ ' ' ~ f.source_module)|lower }}">
+        <h3>{{ f.title }}</h3>
+        <p>
+          <span class="badge sev-{{ f.severity }}">{{ f.severity }}</span>
+          {% if f.cvss_base_score is not none %}
+          CVSS {{ f.cvss_version }} {{ '%.1f'|format(f.cvss_base_score) }} ({{ f.cvss_severity }})
+          {% else %}
+          <span class="muted">CVSS unscored ({{ f.cvss_status }})</span>
+          {% endif %}
+          · {{ f.verification_status }} · confidence {{ f.confidence }}
+          · priority {{ f.operational_priority or 'n/a' }}
+        </p>
+        <p><strong>Endpoint:</strong> {{ f.method }} {{ f.url }}
+          {% if f.parameter %} · <strong>Parameter:</strong> {{ f.parameter }}{% endif %}
+          {% if f.location %} · <strong>Location:</strong> {{ f.location }}{% endif %}
+        </p>
+        {% if f.cvss_vector %}
+        <p><strong>CVSS vector:</strong> <code>{{ f.cvss_vector }}</code>
+          <span class="muted">({{ f.cvss_provenance }})</span></p>
+        {% endif %}
+        <p><strong>Description:</strong> {{ f.description }}</p>
+        <p><strong>Impact:</strong> {{ f.impact }}</p>
+        <p><strong>Remediation:</strong> {{ f.remediation }}</p>
+        <p><strong>Classification:</strong> {{ f.cwe or 'n/a' }} · {{ f.owasp or 'n/a' }}</p>
+        <p><strong>Source:</strong> module={{ f.source_module }}
+          · files={{ f.source_files|join(', ') }}
+          · source_ids={{ f.source_ids|join(', ') or 'n/a' }}</p>
+        <p><strong>Evidence</strong> (escaped text; not executed):</p>
+        <pre>{{ f.evidence | tojson(indent=2) }}</pre>
+        {% if f.references %}
+        <p><strong>References:</strong></p>
+        <ul class="compact">
+          {% for ref in f.references %}<li>{{ ref }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </article>
+      {% else %}
+      <p class="muted">No detailed findings.</p>
+      {% endfor %}
+    </section>
+
+    <section id="assessment-quality">
+      <h2>Assessment quality</h2>
+      <p class="muted">
+        Use this section for academic review of coverage honesty — not as a score of target security.
+      </p>
+      <div class="cards">
+        <div class="card"><div class="num">{{ modules_executed|length }}</div><div class="lbl">Modules executed</div></div>
+        <div class="card"><div class="num">{{ modules_not_executed|length }}</div><div class="lbl">Modules not executed</div></div>
+        <div class="card"><div class="num">{{ summary.by_verification_status.get('confirmed', 0) }}</div><div class="lbl">Confirmed</div></div>
+        <div class="card"><div class="num">{{ summary.by_verification_status.get('probable', 0) + summary.by_verification_status.get('candidate', 0) }}</div><div class="lbl">Needs review</div></div>
+      </div>
+      <h3>False-positive / false-negative guidance</h3>
+      <ul class="compact">
+        <li>Treat <strong>candidate</strong> and <strong>probable</strong> findings as hypotheses requiring validation.</li>
+        <li>CSRF form checks may false-positive when custom header-based CSRF defenses are used.</li>
+        <li>Missing security headers on the home page do not prove every route lacks them.</li>
+        <li>Zero findings is not a certification of security; coverage depends on crawl reach and module success.</li>
+      </ul>
+      <p class="muted">See repository document <code>docs/THREAT_MODEL.md</code> for assets, actors, and residual risk.</p>
+    </section>
+
+    <footer>
+      Generated by VulnSight · schema {{ metadata.schema_version }} · timestamps in UTC · treat all evidence as untrusted data.
+      Modules executed: {{ modules_executed|join(', ') or 'none' }}.
+    </footer>
+  </div>
+  <script>
+    (function () {
+      const chips = [...document.querySelectorAll('.chip[data-filter]')];
+      const search = document.getElementById('find-search');
+      const rows = [...document.querySelectorAll('tr.finding-row')];
+      const details = [...document.querySelectorAll('article.finding')];
+      const countEl = document.getElementById('filter-count');
+      const statusEl = document.getElementById('dl-status');
+      let severity = 'all';
+      const total = rows.length;
+
+      function setStatus(msg) {
+        if (statusEl) statusEl.textContent = msg || '';
+      }
+
+      function haystack(el) {
+        return (
+          (el.getAttribute('data-search') || el.dataset.search || '') +
+          ' ' +
+          (el.textContent || '')
+        ).toLowerCase();
+      }
+
+      function apply() {
+        const q = ((search && search.value) || '').trim().toLowerCase();
+        let visible = 0;
+        rows.forEach((row) => {
+          const sev = (row.getAttribute('data-severity') || row.dataset.severity || '').toLowerCase();
+          const sevOk = severity === 'all' || sev === severity;
+          const textOk = !q || haystack(row).includes(q);
+          const show = sevOk && textOk;
+          row.hidden = !show;
+          if (show) visible += 1;
+        });
+        details.forEach((el) => {
+          const sev = (el.getAttribute('data-severity') || el.dataset.severity || '').toLowerCase();
+          const sevOk = severity === 'all' || sev === severity;
+          const textOk = !q || haystack(el).includes(q);
+          el.hidden = !(sevOk && textOk);
+        });
+        if (countEl) {
+          countEl.textContent = total
+            ? visible + ' of ' + total + ' finding(s) visible'
+            : '0 findings in this report';
+        }
+      }
+
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          severity = (chip.dataset.filter || 'all').toLowerCase();
+          chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+          apply();
+        });
+      });
+      if (search) search.addEventListener('input', apply);
+      rows.forEach((row) => {
+        row.addEventListener('click', (e) => {
+          if (e.target.closest('a')) return;
+          const id = row.dataset.target;
+          const el = document.getElementById(id);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+      apply();
+
+      function triggerBlobDownload(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      }
+
+      function downloadHref(href, filename, mime) {
+        setStatus('Preparing ' + filename + '…');
+        // Prefer fetch→blob so the download attribute works over http(s).
+        return fetch(href, { cache: 'no-store' }).then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.blob();
+        }).then(function (blob) {
+          const typed = mime ? new Blob([blob], { type: mime }) : blob;
+          triggerBlobDownload(typed, filename);
+          setStatus('Downloaded ' + filename);
+        }).catch(function () {
+          // file:// or missing sibling: open the relative path directly.
+          const a = document.createElement('a');
+          a.href = href;
+          a.download = filename;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setStatus('Opened ' + filename + ' (save from the browser if needed)');
+        });
+      }
+
+      const mdSrc = document.getElementById('md-source');
+      function markdownFromPage() {
+        let md = '';
+        try { md = JSON.parse(mdSrc && mdSrc.textContent || '""'); }
+        catch (e) { md = (mdSrc && mdSrc.textContent) || ''; }
+        return typeof md === 'string' ? md : String(md || '');
+      }
+
+      const mdInline = document.getElementById('dl-md-inline');
+      if (mdInline) {
+        mdInline.addEventListener('click', function () {
+          const md = markdownFromPage();
+          triggerBlobDownload(new Blob([md], { type: 'text/markdown;charset=utf-8' }), 'vulnsight_report.md');
+          setStatus('Downloaded vulnsight_report.md');
+        });
+      }
+
+      const mdFile = document.getElementById('dl-md-file');
+      if (mdFile) {
+        mdFile.addEventListener('click', function () {
+          const href = mdFile.getAttribute('data-href') || 'vulnsight_report.md';
+          downloadHref(href, 'vulnsight_report.md', 'text/markdown;charset=utf-8').catch(function () {
+            // Fallback: always available embedded markdown
+            const md = markdownFromPage();
+            triggerBlobDownload(new Blob([md], { type: 'text/markdown;charset=utf-8' }), 'vulnsight_report.md');
+            setStatus('Downloaded vulnsight_report.md (embedded)');
+          });
+        });
+      }
+
+      const pdfBtn = document.getElementById('dl-pdf');
+      if (pdfBtn && !pdfBtn.disabled) {
+        pdfBtn.addEventListener('click', function () {
+          const href = pdfBtn.getAttribute('data-href') || 'vulnsight_report.pdf';
+          downloadHref(href, 'vulnsight_report.pdf', 'application/pdf');
+        });
+      }
+
+      const jsonBtn = document.getElementById('dl-json');
+      if (jsonBtn) {
+        jsonBtn.addEventListener('click', function () {
+          const href = jsonBtn.getAttribute('data-href') || 'normalized_findings.json';
+          downloadHref(href, 'normalized_findings.json', 'application/json');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
