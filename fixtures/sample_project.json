@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "project_name": "Authorized Local Website",
+  "target": "http://127.0.0.1:5001",
+  "authorized_origins": [
+    "http://127.0.0.1:5001"
+  ],
+  "authorization": {
+    "i_own_or_have_permission": true,
+    "authorized_by": "Example Operator",
+    "statement": "I own this system or have explicit written authorization to test it.",
+    "notes": "Point target at your own prepared local vulnerable website before scanning."
+  },
+  "modules": "all",
+  "output": "./reports",
+  "allow_private_network": true,
+  "allow_external": false,
+  "formats": ["json", "html", "md", "pdf"],
+  "crawl": {
+    "max_pages": 40,
+    "timeout": 10.0
+  },
+  "max_requests": 200,
+  "enable_stored_xss": true,
+  "enable_active_verify": true,
+  "enable_browser_verify": false
+}

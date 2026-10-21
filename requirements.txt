@@ -1,0 +1,21 @@
+# Root convenience install for VulnSight modules.
+# Preferred path: pip install -e ".[dev]" (see pyproject.toml).
+
+# Core
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+flask>=3.0.0
+cvss>=3.0
+jinja2>=3.1
+
+# Testing
+pytest>=8.0.0
+
+# Optional faster HTML parse (BeautifulSoup falls back to html.parser)
+# lxml>=5.0.0
+
+# Optional PDF reporting
+# weasyprint>=60.0
+
+# Optional browser verification for XSS
+# playwright>=1.40.0
