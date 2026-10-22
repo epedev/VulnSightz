@@ -256,7 +256,11 @@ def _scan_reflected(
             continue
 
         contexts = analyze_contexts(resp.text, marker.value)
-        inert = contexts.primary in {RenderContext.HTML_COMMENT, RenderContext.CSS}
+        inert = contexts.primary in {
+            RenderContext.HTML_COMMENT,
+            RenderContext.CSS,
+            RenderContext.JSON_IN_HTML,
+        }
         metachar_raw = False
         probe_id = marker.value
         browser_confirmed = False

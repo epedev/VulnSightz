@@ -35,7 +35,6 @@ def _dummy_finding(module: str) -> Finding:
 
 def test_partial_failure_preserves_other_findings(tmp_path):
     sqli_ok = ScanResult(module="sqli", findings=[_dummy_finding("sqli")])
-    cmd_ok = ScanResult(module="command_injection", findings=[_dummy_finding("command_injection")])
     ac_ok = ScanResult(module="access_control", findings=[])
 
     cfg = ScanConfig(

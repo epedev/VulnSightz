@@ -3,9 +3,8 @@
 
 from __future__ import annotations
 
-import re
 from typing import Any
-from urllib.parse import parse_qsl, urlencode, urljoin, urlparse, urlunparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 
@@ -14,7 +13,6 @@ from scanner.models import (
     Finding,
     ScanResult,
     Severity,
-    TestOutcome,
     VerificationStatus,
 )
 
@@ -115,7 +113,6 @@ def _check_cookies(url: str, set_cookie_values: list[str]) -> list[Finding]:
         if not parts:
             continue
         name = parts[0].split("=", 1)[0].strip()
-        attrs = {p.lower() for p in parts[1:]}
         attr_names = {p.split("=", 1)[0].lower() for p in parts[1:]}
         missing = []
         if "httponly" not in attr_names:

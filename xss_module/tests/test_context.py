@@ -33,3 +33,17 @@ def test_url_attribute_context():
     body = f'<a href="{MARKER}">link</a>'
     analysis = analyze_contexts(body, MARKER)
     assert analysis.primary == RenderContext.URL_ATTRIBUTE
+
+
+def test_json_script_type_is_inert():
+    body = f'<script type="application/json">{{"q":"{MARKER}"}}</script>'
+    analysis = analyze_contexts(body, MARKER)
+    assert analysis.primary == RenderContext.JSON_IN_HTML
+    assert analysis.warrants_verification is False
+
+
+def test_json_ld_script_type_is_inert():
+    body = f'<script type="application/ld+json">{{"name":"{MARKER}"}}</script>'
+    analysis = analyze_contexts(body, MARKER)
+    assert analysis.primary == RenderContext.JSON_IN_HTML
+    assert analysis.warrants_verification is False

@@ -113,13 +113,25 @@ def _classify_by_raw_scan(body: str, index: int, marker: str) -> ContextOccurren
         )
 
     # Script block
-    last_script_open = max(before.lower().rfind("<script"), before.lower().rfind("<script "))
-    # more reliable:
-    script_opens = [m.start() for m in re.finditer(r"(?i)<script\b[^>]*>", before)]
+    script_opens = list(re.finditer(r"(?i)<script\b[^>]*>", before))
     script_closes = [m.start() for m in re.finditer(r"(?i)</script\s*>", before)]
-    if script_opens and (not script_closes or script_opens[-1] > script_closes[-1]):
+    if script_opens and (not script_closes or script_opens[-1].start() > script_closes[-1]):
+        open_tag = script_opens[-1].group(0)
+        # Non-executable data scripts (JSON-LD / application/json) are not JS XSS sinks.
+        if re.search(
+            r"""(?i)\btype\s*=\s*['"]?(application/(?:ld\+)?json|text/json)['"]?""",
+            open_tag,
+        ):
+            return ContextOccurrence(
+                context=RenderContext.JSON_IN_HTML,
+                index=index,
+                snippet=snippet,
+                tag_name="script",
+                executable_candidate=False,
+                notes=["json_script_type"],
+            )
         # Inside script — try to detect string quotes
-        region = before[script_opens[-1] :]
+        region = before[script_opens[-1].start() :]
         # Count unescaped quotes roughly in the script so far + immediate after
         single = 0
         double = 0
@@ -207,8 +219,7 @@ def _classify_by_raw_scan(body: str, index: int, marker: str) -> ContextOccurren
                         snippet=snippet,
                         attribute_name=attr_name,
                         tag_name=tag_name,
-                        executable_candidate=ctx != RenderContext.URL_ATTRIBUTE
-                        or True,
+                        executable_candidate=True,
                         notes=["double_quoted_attribute"],
                     )
             if attr_match.group(4) is not None or (
@@ -254,15 +265,16 @@ def _classify_by_raw_scan(body: str, index: int, marker: str) -> ContextOccurren
             notes=["inside_tag_but_attr_unclear"],
         )
 
-    # JSON-looking script type application/json
-    # Already handled script; treat as body otherwise.
-    # Heuristic for JSON embedding
-    window = before[-20:] + marker + after[:20]
-    if re.search(r"""['"]\s*:\s*['"]?$""", before[-40:]) or '"%s"' % marker in (
-        before[-5:] + marker + after[:5]
-    ):
-        # weak signal
-        pass
+    # JSON-looking embedding in HTML text (e.g. inline config blobs).
+    nearby = before[-40:] + marker + after[:5]
+    if re.search(r"""['"]\s*:\s*['"]?$""", before[-40:]) or f'"{marker}"' in nearby:
+        return ContextOccurrence(
+            context=RenderContext.JSON_IN_HTML,
+            index=index,
+            snippet=snippet,
+            executable_candidate=False,
+            notes=["json_like_embedding"],
+        )
 
     return ContextOccurrence(
         context=RenderContext.HTML_BODY,
@@ -292,13 +304,30 @@ def _augment_with_bs4(body: str, marker: str, occurrences: list[ContextOccurrenc
 
     for script in soup.find_all("script"):
         text = script.string or script.get_text() or ""
-        if marker in text:
-            for occ in occurrences:
-                if occ.index >= 0 and marker in occ.snippet:
-                    if occ.context == RenderContext.HTML_BODY:
-                        occ.notes.append("bs4_found_in_script")
-                        occ.context = RenderContext.JS_BLOCK
-                        occ.executable_candidate = True
+        if marker not in text:
+            continue
+        script_type = (script.get("type") or "").strip().lower()
+        is_json_script = script_type in {
+            "application/json",
+            "application/ld+json",
+            "text/json",
+        }
+        for occ in occurrences:
+            if occ.index < 0 or marker not in occ.snippet:
+                continue
+            if is_json_script and occ.context in {
+                RenderContext.HTML_BODY,
+                RenderContext.JS_BLOCK,
+                RenderContext.JS_STRING_SINGLE,
+                RenderContext.JS_STRING_DOUBLE,
+            }:
+                occ.notes.append("bs4_json_script_type")
+                occ.context = RenderContext.JSON_IN_HTML
+                occ.executable_candidate = False
+            elif occ.context == RenderContext.HTML_BODY:
+                occ.notes.append("bs4_found_in_script")
+                occ.context = RenderContext.JS_BLOCK
+                occ.executable_candidate = True
 
 
 def analyze_contexts(body: str, marker: str) -> ContextAnalysis:
@@ -329,6 +358,7 @@ def analyze_contexts(body: str, marker: str) -> ContextAnalysis:
     inert = {
         RenderContext.HTML_COMMENT,
         RenderContext.CSS,
+        RenderContext.JSON_IN_HTML,
         RenderContext.UNKNOWN,
     }
     warrants = any(
