@@ -148,13 +148,12 @@ def main() -> None:
             f'<div class="wrap">{cover}{extract_section(html, "executive-summary")}</div>',
             2400,
         ),
-        ("demo-report-owasp.png", f'<div class="wrap">{extract_section(html, "owasp-top10")}</div>', 2200),
         (
-            "demo-report-findings.png",
-            f'<div class="wrap">{extract_section(html, "findings-overview")}</div>',
-            2600,
+            "demo-report-modules.png",
+            f'<div class="wrap">{extract_section(html, "executive-summary")}</div>',
+            2200,
         ),
-        ("demo-report-detail.png", f'<div class="wrap">{extract_first_finding(html)}</div>', 1800),
+        ("demo-report-owasp.png", f'<div class="wrap">{extract_section(html, "owasp-top10")}</div>', 2200),
     ]
 
     with tempfile.TemporaryDirectory(prefix="vulnsight-shots-") as tmp:

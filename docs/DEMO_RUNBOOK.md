@@ -79,9 +79,7 @@ Demo captures from an authorized local assessment:
 
 ![Report summary](images/demo-report-summary.png)
 
+![Severity and module distribution](images/demo-report-modules.png)
+
 ![OWASP Top 10:2025 coverage](images/demo-report-owasp.png)
-
-![Findings overview](images/demo-report-findings.png)
-
-![Finding detail](images/demo-report-detail.png)
 
