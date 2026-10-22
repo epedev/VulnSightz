@@ -9,8 +9,8 @@
 ## Linux / macOS
 
 ```bash
-git clone https://github.com/epedev/Web-Vuln-Scanner.git
-cd Web-Vuln-Scanner
+git clone https://github.com/epedev/VulnSightz.git
+cd VulnSightz
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -26,8 +26,8 @@ vulnsight docs   # opens interactive docs/index.html
 ## Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/epedev/Web-Vuln-Scanner.git
-cd Web-Vuln-Scanner
+git clone https://github.com/epedev/VulnSightz.git
+cd VulnSightz
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1

@@ -1,6 +1,6 @@
 # Project summary
 
-**Name:** VulnSight (Web-Vuln-Scanner)  
+**Name:** VulnSight (epedev/VulnSightz)  
 **Type:** Modular authorized web vulnerability scanner (CLI)  
 **Group:** Group 3  
 **License:** MIT  

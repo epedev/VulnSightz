@@ -7,7 +7,7 @@ VulnSight does not bundle a vulnerable app — start your team's prepared local 
 ## 0. Environment (once)
 
 ```bash
-cd Web-Vuln-Scanner
+cd VulnSightz
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"
