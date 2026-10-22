@@ -6,9 +6,20 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-555555?style=flat-square)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-pytest-0f4c5c?style=flat-square)](tests/)
 [![Version](https://img.shields.io/badge/version-0.2.0-1faa9a?style=flat-square)](CHANGELOG.md)
+[![Docs](https://img.shields.io/badge/docs-interactive-1faa9a?style=flat-square)](https://epedev.github.io/VulnSightz/)
 [![Repo](https://img.shields.io/badge/github-epedev%2FVulnSightz-0f4c5c?style=flat-square)](https://github.com/epedev/VulnSightz)
 
 VulnSight is a Group 3 graduation project: a complete, ethically constrained scanning pipeline that combines authorization, reconnaissance, multi-class detection, and professional reporting in one CLI.
+
+### Try the interactive docs
+
+Open the living project showcase — pipeline explorer, scan theater, findings playground, typed command recipes, and OWASP Top 10:2025 map:
+
+```bash
+vulnsight docs
+```
+
+Local: [`docs/index.html`](docs/index.html) · after enabling GitHub Pages on the `docs/` folder: **[epedev.github.io/VulnSightz](https://epedev.github.io/VulnSightz/)**
 
 > **Authorized use only.** Scan only systems you own or have written permission to test. This repository does **not** include a vulnerable target application—operators provide their own local website.
 
@@ -135,7 +146,8 @@ vulnsight compare \
 
 | Document | Description |
 |----------|-------------|
-| [docs/index.html](docs/index.html) | Project overview (`vulnsight docs`) |
+| [Interactive docs](https://epedev.github.io/VulnSightz/) | Pipeline · scan theater · findings playground (`vulnsight docs`) |
+| [docs/index.html](docs/index.html) | Same showcase offline |
 | [docs/USAGE.md](docs/USAGE.md) | CLI usage |
 | [docs/INSTALLATION.md](docs/INSTALLATION.md) | Setup notes |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Module contracts |
