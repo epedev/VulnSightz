@@ -164,7 +164,10 @@ def generate_report(
     **pipeline_kwargs: Any,
 ) -> ReportResult:
     """Run pipeline and write HTML / JSON / Markdown / PDF artifacts."""
-    formats = formats or ["html"]
+    formats = formats or ["html", "json", "md", "pdf"]
+    # Keep PDF opt-in via the formats list or the legacy pdf=True flag.
+    if pdf and "pdf" not in formats:
+        formats = list(formats) + ["pdf"]
     result = run_report_pipeline(
         input_paths=input_paths,
         findings_objects=findings_objects,

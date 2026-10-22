@@ -391,7 +391,8 @@
       <span class="label">Export</span>
       <button class="dl-btn" type="button" id="dl-pdf"
         data-href="{{ artifact_links.get('pdf', 'vulnsight_report.pdf') }}"
-        {% if not artifact_links.get('pdf_available', True) %}disabled title="PDF was not generated for this run"{% endif %}>PDF</button>
+        {% if not artifact_links.get('pdf_available', True) %}disabled title="PDF file was not generated for this run — use Print PDF"{% endif %}>PDF</button>
+      <button class="dl-btn" type="button" id="dl-pdf-print" title="Open the browser print dialog (Save as PDF)">Print PDF</button>
       <button class="dl-btn" type="button" id="dl-md-file"
         data-href="{{ artifact_links.get('md', 'vulnsight_report.md') }}">Markdown</button>
       <button class="dl-btn" type="button" id="dl-md-inline">Markdown (page)</button>
@@ -903,6 +904,20 @@
         pdfBtn.addEventListener('click', function () {
           const href = pdfBtn.getAttribute('data-href') || 'vulnsight_report.pdf';
           downloadHref(href, 'vulnsight_report.pdf', 'application/pdf');
+        });
+      }
+      const pdfPrint = document.getElementById('dl-pdf-print');
+      if (pdfPrint) {
+        pdfPrint.addEventListener('click', function () {
+          document.querySelectorAll('.finding').forEach(function (el) {
+            el.classList.add('is-open');
+            const trigger = el.querySelector('[data-accordion-trigger]');
+            const toggle = el.querySelector('.finding-toggle');
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
+            if (toggle) toggle.textContent = 'Hide details';
+          });
+          setStatus('Opening print dialog — choose “Save as PDF”');
+          window.setTimeout(function () { window.print(); }, 80);
         });
       }
 

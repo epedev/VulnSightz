@@ -7,6 +7,7 @@ beautifulsoup4>=4.12.0
 flask>=3.0.0
 cvss>=3.0
 jinja2>=3.1
+reportlab>=4.0.0
 
 # Testing
 pytest>=8.0.0
@@ -14,7 +15,7 @@ pytest>=8.0.0
 # Optional faster HTML parse (BeautifulSoup falls back to html.parser)
 # lxml>=5.0.0
 
-# Optional PDF reporting
+# Optional HTML-faithful PDF rendering (ReportLab is the default PDF backend)
 # weasyprint>=60.0
 
 # Optional browser verification for XSS

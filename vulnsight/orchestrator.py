@@ -436,7 +436,7 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
                 "reporting", "report_module.py", "run_report_module"
             )
 
-            formats = list(cfg.formats) or ["json", "html"]
+            formats = list(cfg.formats) or ["json", "html", "md", "pdf"]
             extra_limits: list[str] = []
             if failed_modules:
                 extra_limits.append(
@@ -451,6 +451,7 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
                 findings_objects=all_findings,
                 output_dir=str(out),
                 formats=formats,
+                pdf=("pdf" in formats),
                 target=target,
                 authorized_origin=origin,
                 scope=(

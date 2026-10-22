@@ -126,9 +126,18 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         choices=["html", "json", "pdf", "md", "markdown"],
         default=[],
-        help="Output format (repeatable). Default: html+json",
+        help="Output format (repeatable). Default: html+json+md+pdf",
     )
-    p.add_argument("--pdf", action="store_true", help="Also write PDF (WeasyPrint or ReportLab)")
+    p.add_argument(
+        "--pdf",
+        action="store_true",
+        help="Also write PDF (default when using built-in formats; WeasyPrint or ReportLab)",
+    )
+    p.add_argument(
+        "--no-pdf",
+        action="store_true",
+        help="Skip PDF export even when using default formats",
+    )
     p.add_argument("--md", action="store_true", help="Also write Markdown report")
     p.add_argument("--output", "-o", default="reports", help="Output directory")
     p.add_argument("--target", default="unspecified")
@@ -157,11 +166,13 @@ def main(argv: list[str] | None = None) -> int:
         print("error: provide at least one of --xss/--sqli/--misconfig/--input", file=sys.stderr)
         return 2
 
-    formats = list(args.format) if args.format else ["html", "json", "md"]
+    formats = list(args.format) if args.format else ["html", "json", "md", "pdf"]
     if args.pdf and "pdf" not in formats:
         formats.append("pdf")
     if getattr(args, "md", False) and "md" not in formats:
         formats.append("md")
+    if args.no_pdf:
+        formats = [f for f in formats if f != "pdf"]
 
     try:
         result = run_report_module(
@@ -171,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
             extra_paths=args.input,
             output_dir=args.output,
             formats=formats,
-            pdf=args.pdf or ("pdf" in formats),
+            pdf=("pdf" in formats),
             target=args.target,
             authorized_origin=args.origin,
             scope=args.scope,

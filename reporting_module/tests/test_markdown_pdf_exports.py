@@ -61,6 +61,7 @@ def test_html_contains_download_controls(tmp_path):
     assert "dl-md-inline" in html
     assert "dl-md-file" in html
     assert "dl-pdf" in html
+    assert "dl-pdf-print" in html
     assert 'id="methodology"' not in html
     assert "Methodology and limitations" not in html
     assert "#methodology" not in html
@@ -69,24 +70,26 @@ def test_html_contains_download_controls(tmp_path):
 
 
 def test_pdf_when_backend_available(tmp_path):
-    if not pdf_backend_available():
-        result = generate_report(
-            output_dir=tmp_path,
-            findings_objects=_sample_objects(),
-            formats=["html", "pdf"],
-            pdf=True,
-        )
-        assert "pdf" not in result.outputs
-        assert any("PDF" in x for x in result.limitations)
-        assert result.incomplete is False
-        return
+    assert pdf_backend_available(), "ReportLab should ship as a core dependency for PDF export"
     result = generate_report(
         output_dir=tmp_path,
         findings_objects=_sample_objects(),
         formats=["html", "pdf"],
         pdf=True,
         target="http://127.0.0.1:5001",
+        authorized_origin="http://127.0.0.1:5001",
     )
     assert "pdf" in result.outputs
     pdf = Path(result.outputs["pdf"])
     assert pdf.exists() and pdf.stat().st_size > 100
+
+
+def test_default_formats_include_pdf(tmp_path):
+    result = generate_report(
+        output_dir=tmp_path,
+        findings_objects=_sample_objects(),
+        target="http://127.0.0.1:5001",
+        authorized_origin="http://127.0.0.1:5001",
+    )
+    assert "pdf" in result.outputs
+    assert Path(result.outputs["pdf"]).exists()

@@ -75,7 +75,7 @@ Authorize → Recon → Detect (XSS / SQLi / Cmd / Access / Hygiene) → Report
 
 - Python 3.10+
 - An authorized local website under test
-- Optional: WeasyPrint or ReportLab for PDF export
+- PDF export via ReportLab (included); optional WeasyPrint for HTML-faithful PDFs
 
 ---
 

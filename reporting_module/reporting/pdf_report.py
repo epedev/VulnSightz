@@ -112,13 +112,31 @@ def _write_pdf_reportlab(result: ReportResult, path: Path) -> None:
     )
     story.append(Spacer(1, 8))
     story.append(Paragraph("Executive summary", h2))
+    by_sev = summary.get("by_severity") or {}
+    sev_bits = ", ".join(f"{k}={v}" for k, v in by_sev.items()) or "none"
+    by_mod = summary.get("by_source_module") or {}
+    mod_bits = ", ".join(f"{k}={v}" for k, v in by_mod.items()) or "none"
     story.append(
         Paragraph(
             f"Unique findings: <b>{summary.get('total_unique_findings', 0)}</b> · "
-            f"Highest CVSS: <b>{summary.get('highest_cvss_score') if summary.get('highest_cvss_score') is not None else '—'}</b>",
+            f"Highest CVSS: <b>{summary.get('highest_cvss_score') if summary.get('highest_cvss_score') is not None else '—'}</b><br/>"
+            f"By severity: {sev_bits}<br/>"
+            f"By module: {mod_bits}",
             body,
         )
     )
+    owasp = summary.get("owasp_top10") or {}
+    if owasp:
+        story.append(Paragraph("OWASP Top 10 coverage", h2))
+        story.append(
+            Paragraph(
+                f"{owasp.get('standard', 'OWASP Top 10')} · "
+                f"categories with findings: "
+                f"<b>{owasp.get('categories_with_findings', 0)}</b> / "
+                f"{owasp.get('categories_tracked', 10)}",
+                body,
+            )
+        )
     story.append(Paragraph("Findings", h2))
 
     if not result.findings:
