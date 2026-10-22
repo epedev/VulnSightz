@@ -1,6 +1,6 @@
 # Access Control Module
 
-A modular Python contribution to the Web-Vuln-Scanner project, focused on detecting Insecure Direct Object Reference (IDOR) and broken access control in an intentionally vulnerable local Flask training application.
+A modular Python component of VulnSight focused on detecting Insecure Direct Object Reference (IDOR) and broken access control against an authorized local training application.
 
 ## Modules
 

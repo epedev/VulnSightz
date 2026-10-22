@@ -16,15 +16,15 @@ VulnSight is a Group 3 graduation project: a complete, ethically constrained sca
 
 ## Group 3
 
-| Student name | Student ID | Primary ownership |
-|--------------|------------|-------------------|
-| Kenean Amare Eshetu | CTC-4837-26 | SQL injection & command injection (`sqli_&_command_module/`) |
-| Kenneti Hailu Dange | CTC-535-26 | XSS detection (`xss_module/`) |
-| Kidsit Ephrem | CTC-6744-26 | Documentation (`docs/`) |
-| Alazar Elias Digafe | CTC-631-26 | Reconnaissance / crawler (`Crawler/`) |
-| Firaol Mustefa Gossa | CTC-4301-26 | Access control (`access_control_module/`) |
+| Student name | Student ID |
+|--------------|------------|
+| Kenean Amare Eshetu | CTC-4837-26 |
+| Kenneti Hailu Dange | CTC-535-26 |
+| Kidsit Ephrem | CTC-6744-26 |
+| Alazar Elias Digafe | CTC-631-26 |
+| Firaol Mustefa Gossa | CTC-4301-26 |
 
-Shared platform modules (orchestration, hygiene checks, reporting) integrate the pipeline end-to-end. See [AUTHORS.md](AUTHORS.md).
+See also [AUTHORS.md](AUTHORS.md).
 
 ---
 
@@ -143,7 +143,7 @@ vulnsight compare \
 | [docs/SECURITY.md](docs/SECURITY.md) | Authorized-use policy |
 | [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) | Threat model & FP/FN guidance |
 | [docs/OWASP_TOP10.md](docs/OWASP_TOP10.md) | OWASP Top 10:2025 mapping |
-| [AUTHORS.md](AUTHORS.md) | Contributors & ownership |
+| [AUTHORS.md](AUTHORS.md) | Project contributors |
 
 ---
 

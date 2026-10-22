@@ -20,22 +20,22 @@ flowchart LR
   Report --> HTML[vulnsight_report.html]
 ```
 
-## Five-person ownership
+## Module interfaces
 
-| Member | Path | Public interface | Contract |
-|--------|------|------------------|----------|
-| 1 Recon | `Crawler/` | `run_crawler_module(...)` | `crawl_map.json` schema v1.0 |
-| 2 Injection | `sqli_&_command_module/` | `check_local_target(base_url)` | `ScanResult` / `Finding` |
-| 3 XSS | `xss_module/` | `run_xss_module(...)` | `ScanResult` + crawl map consumer |
-| 4 Auth/AC | `access_control_module/` | `check_local_target(base_url)` | Lab identities + `ScanResult` |
-| 5 Reporting | `reporting_module/` | `run_report_module(...)` | Canonical findings + OWASP Top 10:2025 (+2021 continuity) + HTML/JSON |
+| Area | Path | Public interface | Contract |
+|------|------|------------------|----------|
+| Recon | `Crawler/` | `run_crawler_module(...)` | `crawl_map.json` schema v1.0 |
+| Injection | `sqli_&_command_module/` | `check_local_target(base_url)` | `ScanResult` / `Finding` |
+| XSS | `xss_module/` | `run_xss_module(...)` | `ScanResult` + crawl map consumer |
+| Access control | `access_control_module/` | `check_local_target(base_url)` | Lab identities + `ScanResult` |
+| Reporting | `reporting_module/` | `run_report_module(...)` | Canonical findings + OWASP Top 10:2025 (+2021 continuity) + HTML/JSON |
 | Hygiene | `misconfig_module/` | `check_local_target(base_url, crawl_map)` | Headers/CSRF/cookies/redirect/SSRF/disclosure |
 
 ## Shared models
 
 - Detection findings: `xss_module/scanner/models.py` (`Finding`, `ScanResult`)
 - Reporting canonical schema: `reporting_module/reporting/schema.py`
-- Orchestrator adds member directories to `sys.path` via `vulnsight/paths.py`
+- Orchestrator adds module directories to `sys.path` via `vulnsight/paths.py`
 
 ## Adding a new detection module
 
@@ -43,7 +43,7 @@ flowchart LR
 2. Emit `Finding` objects via `scanner.models` (or JSON compatible with reporting normalization).
 3. Register the module name in `vulnsight.config.ALL_MODULES` and call it from `vulnsight.orchestrator`.
 4. Add unit tests plus optional live tests behind `VULNSIGHT_LAB_URL`.
-5. Document ownership in this file and `docs/MODULE_GUIDE.md`.
+5. Document the module contract in this file and `docs/MODULE_GUIDE.md`.
 
 ## Safety
 

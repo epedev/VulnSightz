@@ -5,7 +5,7 @@ Thank you for contributing to VulnSight.
 ## Guidelines
 
 1. Prefer a focused feature branch for each change.
-2. Keep module ownership clear (`Crawler/`, `xss_module/`, `sqli_&_command_module/`, `access_control_module/`, `reporting_module/`).
+2. Keep module boundaries clear (`Crawler/`, `xss_module/`, `sqli_&_command_module/`, `access_control_module/`, `reporting_module/`).
 3. Add or update tests when behavior changes.
 4. Run `python -m pytest` before opening a pull request.
 5. Do not commit secrets, credentials, or live scan reports (`reports/` is gitignored).
