@@ -9,7 +9,16 @@ Cross-Site Scripting detection for VulnSight — reflected and stored XSS with m
 - HTML body / attribute / JavaScript / URL / comment contexts
 - Opt-in metachar probes, extended educational probes, stored XSS, browser verify
 - Fail-closed scope (explicit `--origin`, optional loopback/private)
-- Structured findings (`CWE-79`, OWASP A03:2021) compatible with the reporting module
+- Structured findings (`CWE-79`, OWASP A05:2025) compatible with the reporting module
+
+
+## Detection flow
+
+1. Load in-scope inputs from `crawl_map.json`
+2. Inject unique alphanumeric markers (non-executable)
+3. Classify reflection encoding and render context
+4. Optionally run metachar / extended / stored / browser verification
+5. Emit structured findings for the reporting module
 
 ## Setup
 

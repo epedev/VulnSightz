@@ -30,7 +30,7 @@ from xss.verification import (
     select_probe,
 )
 
-logger = logging.getLogger("web_vuln.xss")
+logger = logging.getLogger("vulnsight.xss")
 
 
 def _params_for_point(point: InputPoint, inject_value: str) -> dict[str, str]:

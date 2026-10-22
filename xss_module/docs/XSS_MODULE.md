@@ -56,7 +56,7 @@ examples are replaced with unique in-page signals or short reflection probes.
 
 ## Finding schema
 
-Each finding includes: `id`, `vulnerability_type` (`xss.reflected` / `xss.stored`), `title`, `url`, `method`, `parameter`, `input_type`, `context`, `payload_or_probe_id`, `evidence`, `detection_method`, `confidence`, `severity`, `verification_status`, `http_status`, `cwe` (CWE-79), `owasp` (A03:2021), `description`, `impact`, `remediation`, `references`, `timestamp`, `confidence_reasons`.
+Each finding includes: `id`, `vulnerability_type` (`xss.reflected` / `xss.stored`), `title`, `url`, `method`, `parameter`, `input_type`, `context`, `payload_or_probe_id`, `evidence`, `detection_method`, `confidence`, `severity`, `verification_status`, `http_status`, `cwe` (CWE-79), `owasp` (A05:2025), `description`, `impact`, `remediation`, `references`, `timestamp`, `confidence_reasons`.
 
 ### Verification status
 
@@ -127,7 +127,7 @@ pytest -q
 ## References
 
 - [CWE-79](https://cwe.mitre.org/data/definitions/79.html)
-- [OWASP Top 10 2021 A03 Injection](https://owasp.org/Top10/A03_2021-Injection/)
+- [OWASP Top 10 2025 A05 Injection](https://owasp.org/Top10/2025/A05_2025-Injection/)
 - [OWASP XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
 - [PortSwigger XSS Academy](https://portswigger.net/web-security/cross-site-scripting)
 - [OWASP WSTG](https://owasp.org/www-project-web-security-testing-guide/)

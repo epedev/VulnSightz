@@ -11,7 +11,7 @@ from urllib.parse import urlparse, urlunparse
 
 from xss.crawl_map_schema import validate_crawl_map
 
-logger = logging.getLogger("web_vuln.xss.input")
+logger = logging.getLogger("vulnsight.xss.input")
 
 
 @dataclass(frozen=True)

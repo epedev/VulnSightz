@@ -11,7 +11,7 @@ from xss.markers import Marker
 from xss.payload_catalog import CatalogProbe, primary_probe_for, probes_for_context
 from xss.reflection import ReflectionKind, classify_probe_encoding
 
-logger = logging.getLogger("web_vuln.xss.verify")
+logger = logging.getLogger("vulnsight.xss.verify")
 
 
 @dataclass
@@ -58,6 +58,24 @@ def select_extended_probes(
     return [p for p in probes if p.probe_id not in skip][:limit]
 
 
+def _html_body_has_raw_breakout(body: str, marker: Marker, probe: str) -> bool:
+    """True when an unescaped breakout appears near the reflected marker."""
+    if marker.value not in body:
+        return False
+    idx = body.find(marker.value)
+    end = idx + len(marker.value) + len(probe) + 5
+    window = body[idx:end]
+    if "<" not in window:
+        return False
+    # Ignore the marker itself; look for a literal < that is not an HTML entity.
+    remainder = window.replace(marker.value, "", 1)
+    if "&lt;" in remainder and "<" not in remainder.replace("&lt;", ""):
+        return False
+    if marker.value + probe in body:
+        return True
+    return "<" in body[idx : idx + len(marker.value) + len(probe) + 2]
+
+
 def evaluate_probe_response(
     body: str,
     marker: Marker,
@@ -67,14 +85,8 @@ def evaluate_probe_response(
 ) -> ProbeResult:
     kind = classify_probe_encoding(body, marker.value, probe)
     metachar_raw = kind == ReflectionKind.RAW
-    # Extra check: for HTML body, ensure '<' reflected unescaped near marker
-    if context == RenderContext.HTML_BODY and marker.value in body:
-        idx = body.find(marker.value)
-        window = body[idx : idx + len(marker.value) + len(probe) + 5]
-        if "<" in window and "&lt;" not in window.replace(marker.value, ""):
-            # crude: raw < present after marker region
-            if marker.value + probe in body or (marker.value in body and "<" in body[idx:idx+40]):
-                metachar_raw = metachar_raw or ("<" in body[idx : idx + len(marker.value) + len(probe) + 2])
+    if context == RenderContext.HTML_BODY:
+        metachar_raw = metachar_raw or _html_body_has_raw_breakout(body, marker, probe)
     return ProbeResult(
         probe_id=probe_id,
         probe=probe,

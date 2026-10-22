@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urlparse
 
-logger = logging.getLogger("web_vuln.xss.browser")
+logger = logging.getLogger("vulnsight.xss.browser")
 
 
 @dataclass

@@ -13,7 +13,7 @@ from scanner.logging_utils import redact_mapping, redact_text
 from xss.config import XSSConfig
 from xss.scope import ScopeController, ScopeError
 
-logger = logging.getLogger("web_vuln.xss.http")
+logger = logging.getLogger("vulnsight.xss.http")
 
 
 class RequestBudgetExceeded(Exception):

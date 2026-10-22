@@ -1,6 +1,6 @@
-from scanner.models import Finding, VerificationStatus
+from scanner.models import Finding, Severity, VerificationStatus
 from xss.context_analyzer import RenderContext
-from xss.findings import build_finding, dedupe_findings
+from xss.findings import build_finding, dedupe_findings, severity_for
 from xss.reflection import ReflectionKind
 from xss.findings import confidence_from_evidence
 
@@ -86,4 +86,49 @@ def test_finding_has_cwe_owasp():
     )
     assert f.cwe == "CWE-79"
     assert "A05" in f.owasp
+    assert "2025" in f.owasp
     assert isinstance(f, Finding)
+
+
+def test_severity_confirmed_stored_is_high():
+    assert (
+        severity_for(
+            verification_status=VerificationStatus.CONFIRMED.value,
+            context=RenderContext.HTML_BODY,
+            stored=True,
+        )
+        == Severity.HIGH.value
+    )
+
+
+def test_severity_confirmed_reflected_is_medium():
+    assert (
+        severity_for(
+            verification_status=VerificationStatus.CONFIRMED.value,
+            context=RenderContext.HTML_BODY,
+            stored=False,
+        )
+        == Severity.MEDIUM.value
+    )
+
+
+def test_build_finding_stored_title():
+    f = build_finding(
+        vulnerability_type="xss.stored",
+        url="http://127.0.0.1:5001/comments",
+        method="POST",
+        parameter="body",
+        input_type="textarea",
+        context=RenderContext.HTML_BODY,
+        payload_or_probe_id="m",
+        evidence={},
+        detection_method="stored_marker",
+        confidence="high",
+        verification_status=VerificationStatus.PROBABLE.value,
+        http_status=200,
+        description="stored reflection",
+        impact="persistent script execution",
+    )
+    assert f.title.startswith("Stored XSS")
+    assert f.module == "xss"
+    assert f.severity == Severity.MEDIUM.value

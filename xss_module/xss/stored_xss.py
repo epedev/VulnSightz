@@ -16,7 +16,7 @@ from xss.markers import Marker, generate_marker
 from xss.reflection import ReflectionKind, classify_marker_reflection
 from xss.scope import ScopeError
 
-logger = logging.getLogger("web_vuln.xss.stored")
+logger = logging.getLogger("vulnsight.xss.stored")
 
 
 @dataclass

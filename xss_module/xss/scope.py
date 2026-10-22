@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 from xss.config import XSSConfig
 
-logger = logging.getLogger("web_vuln.xss.scope")
+logger = logging.getLogger("vulnsight.xss.scope")
 
 
 class ScopeError(Exception):
