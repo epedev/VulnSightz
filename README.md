@@ -123,11 +123,11 @@ Authorized local scan against a prepared vulnerable target, with VulnSight produ
 
 ![VulnSight scan alongside the local target application](docs/images/demo-scan-terminals.png)
 
-![HTML report executive summary](docs/images/demo-report-summary.png)
+![HTML report cover with PDF/Markdown/JSON export](docs/images/demo-report-summary.png)
+
+![Severity and source-module distribution from a live scan](docs/images/demo-report-modules.png)
 
 ![OWASP Top 10:2025 coverage](docs/images/demo-report-owasp.png)
-
-![Findings overview with severity filters](docs/images/demo-report-findings.png)
 
 ---
 
