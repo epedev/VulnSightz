@@ -193,8 +193,11 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
         not_executed.append("xss")
     else:
         try:
-            from xss_module import run_xss_module
+            from vulnsight.paths import load_entrypoint
 
+            run_xss_module = load_entrypoint("xss", "xss_module.py", "run_xss_module")
+            # Extended probes require both active verification and metachar probes.
+            extended = bool(cfg.enable_active_verify and cfg.enable_metachar_probes)
             result = run_xss_module(
                 crawl_map=crawl_map,
                 crawl_map_path=None if crawl_map is not None else crawl_map_path,
@@ -205,7 +208,7 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
                 enable_stored_xss=cfg.enable_stored_xss,
                 enable_browser_verification=cfg.enable_browser_verify,
                 enable_metachar_probes=cfg.enable_metachar_probes,
-                enable_extended_probes=cfg.enable_active_verify,
+                enable_extended_probes=extended,
                 timeout=cfg.timeout,
                 max_requests=cfg.max_requests,
                 verbose=cfg.verbose,
@@ -427,7 +430,11 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
         report_paths["findings_raw"] = str(combined_path)
     else:
         try:
-            from report_module import run_report_module
+            from vulnsight.paths import load_entrypoint
+
+            run_report_module = load_entrypoint(
+                "reporting", "report_module.py", "run_report_module"
+            )
 
             formats = list(cfg.formats) or ["json", "html"]
             extra_limits: list[str] = []

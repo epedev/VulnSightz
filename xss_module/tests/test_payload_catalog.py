@@ -52,14 +52,16 @@ def test_manifest_excludes_aggressive_lists():
 
 
 def test_extended_probes_require_active_flags():
-    with pytest.raises(ValueError):
-        XSSConfig(
-            allowed_origins=["http://127.0.0.1:5001"],
-            allow_loopback=True,
-            enable_extended_probes=True,
-            enable_active_verification=False,
-            enable_metachar_probes=False,
-        ).validate()
+    cfg = XSSConfig(
+        allowed_origins=["http://127.0.0.1:5001"],
+        allow_loopback=True,
+        enable_extended_probes=True,
+        enable_active_verification=False,
+        enable_metachar_probes=False,
+    )
+    cfg.validate()
+    # Missing prerequisites: extended probes are disabled instead of hard-failing.
+    assert cfg.enable_extended_probes is False
 
 
 def test_encoding_probes_only_for_body_when_requested():

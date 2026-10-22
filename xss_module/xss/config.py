@@ -62,11 +62,11 @@ class XSSConfig:
             self.marker_only = False
         if self.enable_extended_probes:
             if not self.enable_active_verification or not self.enable_metachar_probes:
-                raise ValueError(
-                    "enable_extended_probes requires enable_active_verification "
-                    "and enable_metachar_probes"
-                )
-            self.marker_only = False
+                # Degrade gracefully — orchestrator / callers may enable active
+                # verification without metachar probes.
+                self.enable_extended_probes = False
+            else:
+                self.marker_only = False
         if self.max_extended_probes < 0:
             raise ValueError("max_extended_probes must be >= 0")
         if self.timeout <= 0 or self.connect_timeout <= 0:
