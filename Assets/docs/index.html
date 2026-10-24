@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VulnSight — see the weakness · prove the risk</title>
+  <meta name="description" content="Interactive docs for VulnSight: authorized modular web vulnerability scanner by Group 3.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0c1b22;
+      --muted: #5a7179;
+      --line: rgba(12, 40, 48, 0.12);
+      --brand: #0d4a57;
+      --accent: #1a9e8f;
+      --accent-soft: rgba(26, 158, 143, 0.14);
+      --amber: #c98512;
+      --amber-soft: rgba(201, 133, 18, 0.16);
+      --paper: #e8eef0;
+      --paper-deep: #dfe8ea;
+      --card: #ffffff;
+      --shadow: 0 14px 40px rgba(12, 27, 34, 0.08);
+      --crit: #9f1239;
+      --high: #c2410c;
+      --med: #b45309;
+      --low: #1d4ed8;
+      --info: #475569;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 420px at 8% -10%, rgba(26,158,143,0.16), transparent 55%),
+        radial-gradient(700px 340px at 100% 0%, rgba(201,133,18,0.10), transparent 50%),
+        linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    a { color: var(--brand); text-underline-offset: 2px; }
+    a:hover { color: var(--accent); }
+    code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.9em; }
+    .shell { max-width: 1120px; margin: 0 auto; padding: 0.85rem 1.15rem 4.5rem; }
+
+    .topnav {
+      position: sticky; top: 0.55rem; z-index: 50;
+      display: flex; flex-wrap: wrap; gap: 0.65rem 1rem;
+      align-items: center; justify-content: space-between;
+      backdrop-filter: blur(14px) saturate(1.2);
+      background: rgba(232, 238, 240, 0.84);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.5rem 0.85rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .brand {
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 600; letter-spacing: 0.12em; font-size: 0.78rem; color: var(--brand);
+    }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 0.1rem; }
+    .nav-links a {
+      text-decoration: none; font-size: 0.84rem; color: var(--muted);
+      padding: 0.35rem 0.65rem; border-radius: 999px; font-weight: 500;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .nav-links a:hover, .nav-links a.is-active {
+      background: var(--accent-soft); color: var(--brand);
+    }
+
+    .hero {
+      position: relative; overflow: hidden;
+      min-height: min(78vh, 620px);
+      border-radius: calc(var(--radius) + 6px);
+      color: #f3fbfa;
+      display: grid; align-content: end;
+      padding: clamp(1.6rem, 4vw, 2.8rem);
+      background:
+        linear-gradient(145deg, rgba(13,74,87,0.97), rgba(11,47,56,0.98)),
+        radial-gradient(520px 240px at 88% 18%, rgba(26,158,143,0.38), transparent 60%);
+      box-shadow: 0 22px 48px rgba(11, 47, 56, 0.24);
+      animation: rise 0.55s ease both;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 36px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 36px);
+      opacity: 0.55; pointer-events: none;
+    }
+    .hero::after {
+      content: ""; position: absolute; width: 280px; height: 280px; border-radius: 50%;
+      right: -40px; bottom: -90px;
+      background: radial-gradient(circle, rgba(201,133,18,0.32), transparent 68%);
+      animation: floaty 9s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .hero-orbit {
+      position: absolute; top: 12%; right: 8%; width: 160px; height: 160px;
+      border: 1px solid rgba(26,158,143,0.35); border-radius: 50%;
+      animation: spin 28s linear infinite; pointer-events: none;
+    }
+    .hero-orbit span {
+      position: absolute; top: -5px; left: 50%; width: 10px; height: 10px;
+      margin-left: -5px; border-radius: 50%; background: var(--amber);
+      box-shadow: 0 0 0 4px rgba(201,133,18,0.2);
+    }
+    .hero-kicker {
+      position: relative; z-index: 1;
+      font-family: "IBM Plex Mono", monospace;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      font-size: 0.72rem; color: #f0c36a; margin-bottom: 0.7rem;
+    }
+    .hero h1 {
+      position: relative; z-index: 1; margin: 0;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: clamp(2.6rem, 8vw, 4.6rem);
+      line-height: 0.95; letter-spacing: -0.03em; max-width: 10ch;
+    }
+    .hero .tagline {
+      position: relative; z-index: 1;
+      margin: 0.85rem 0 0; font-family: "IBM Plex Mono", monospace;
+      font-size: 0.92rem; color: rgba(243,251,250,0.78); letter-spacing: 0.04em;
+    }
+    .hero p {
+      position: relative; z-index: 1;
+      max-width: 36rem; margin: 0.85rem 0 1.35rem;
+      color: rgba(243,251,250,0.86); font-size: 1.05rem;
+    }
+    .cta-row { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.65rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      border: 1px solid transparent; border-radius: 999px;
+      padding: 0.68rem 1.05rem; font-weight: 600; font-size: 0.92rem;
+      cursor: pointer; text-decoration: none;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+    .btn-primary { background: #e8b44a; color: #1a1200; }
+    .btn-primary:hover { background: #f0c36a; color: #1a1200; }
+    .btn-ghost { background: transparent; color: #f3fbfa; border-color: rgba(243,251,250,0.35); }
+    .btn-ghost:hover { color: #fff; border-color: rgba(243,251,250,0.65); }
+    .btn-solid { background: var(--brand); color: #fff; }
+    .btn-solid:hover { background: #135a69; color: #fff; }
+    .btn-soft { background: var(--accent-soft); color: var(--brand); border-color: transparent; }
+
+    .section { margin-top: 2.35rem; animation: rise 0.5s ease both; }
+    .section h2 {
+      margin: 0 0 0.35rem;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: clamp(1.45rem, 3vw, 1.85rem);
+      color: var(--brand); letter-spacing: -0.02em;
+    }
+    .lead { color: var(--muted); margin: 0 0 1.15rem; max-width: 46rem; }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.15rem 1.2rem;
+    }
+
+    /* Pipeline */
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.55rem;
+      margin-bottom: 0.9rem;
+    }
+    .pipe-step {
+      position: relative;
+      border: 1px solid var(--line);
+      background: #f7fbfb;
+      border-radius: 12px;
+      padding: 0.85rem 0.75rem;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+    }
+    .pipe-step:hover { transform: translateY(-2px); border-color: rgba(26,158,143,0.45); }
+    .pipe-step[aria-pressed="true"] {
+      background: var(--brand); color: #f3fbfa; border-color: var(--brand);
+    }
+    .pipe-step .n {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.7rem; letter-spacing: 0.08em; color: var(--accent);
+      display: block; margin-bottom: 0.25rem;
+    }
+    .pipe-step[aria-pressed="true"] .n { color: #f0c36a; }
+    .pipe-step strong { display: block; font-size: 0.95rem; }
+    .pipe-detail {
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      background: rgba(26,158,143,0.08);
+      border-radius: 0 12px 12px 0;
+      min-height: 4.5rem;
+    }
+    .pipe-detail h3 { margin: 0 0 0.35rem; font-size: 1.02rem; }
+    .pipe-detail p { margin: 0; color: var(--muted); }
+
+    /* Modules */
+    .mod-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: 0.9rem;
+    }
+    .mod-list { display: grid; gap: 0.45rem; }
+    .mod-btn {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      width: 100%; text-align: left;
+      border: 1px solid var(--line); background: #f7fbfb;
+      border-radius: 12px; padding: 0.75rem 0.85rem; cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .mod-btn:hover { border-color: rgba(26,158,143,0.45); }
+    .mod-btn[aria-pressed="true"] {
+      background: var(--accent-soft); border-color: rgba(26,158,143,0.55);
+    }
+    .mod-btn .dot {
+      width: 10px; height: 10px; border-radius: 50%; margin-top: 0.35rem;
+      background: var(--accent); flex: 0 0 auto;
+    }
+    .mod-btn strong { display: block; font-size: 0.95rem; }
+    .mod-btn span { color: var(--muted); font-size: 0.86rem; }
+    .mod-stage {
+      border: 1px solid var(--line); border-radius: 12px;
+      background: #0b1c22; color: #d7ebe7; padding: 1rem 1.1rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.84rem;
+      min-height: 220px; position: relative; overflow: hidden;
+    }
+    .mod-stage .glow {
+      position: absolute; width: 160px; height: 160px; border-radius: 50%;
+      right: -30px; top: -40px;
+      background: radial-gradient(circle, rgba(26,158,143,0.28), transparent 70%);
+      pointer-events: none;
+    }
+    .mod-stage h3 {
+      margin: 0 0 0.55rem; font-family: "DM Sans", sans-serif;
+      color: #f0c36a; font-size: 1rem; position: relative;
+    }
+    .mod-stage p { margin: 0 0 0.75rem; color: rgba(215,235,231,0.85); position: relative; }
+    .mod-stage ul { margin: 0; padding-left: 1.1rem; position: relative; }
+    .mod-stage li { margin: 0.25rem 0; }
+
+    /* Theater */
+    .theater-head {
+      display: flex; flex-wrap: wrap; gap: 0.65rem;
+      align-items: center; justify-content: space-between;
+      margin-bottom: 0.85rem;
+    }
+    .theater-log {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.82rem;
+      background: #0b1c22; color: #d7ebe7;
+      border-radius: 12px; padding: 0.9rem 1rem;
+      min-height: 210px; max-height: 280px; overflow: auto;
+    }
+    .theater-log .ok { color: #4ade80; }
+    .theater-log .run { color: #f0c36a; }
+    .theater-log .dim { color: rgba(215,235,231,0.55); }
+    .bars { display: grid; gap: 0.45rem; margin-top: 0.9rem; }
+    .bar-row { display: grid; grid-template-columns: 7.5rem 1fr 2.2rem; gap: 0.55rem; align-items: center; font-size: 0.86rem; }
+    .bar-track { height: 8px; background: rgba(12,40,48,0.08); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; width: 0; border-radius: 999px; transition: width 0.45s ease; background: linear-gradient(90deg, var(--brand), var(--accent)); }
+
+    /* Findings playground */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+    .chip {
+      border: 1px solid var(--line); background: #fff; color: var(--ink);
+      border-radius: 999px; padding: 0.4rem 0.75rem; font-size: 0.84rem;
+      cursor: pointer; font-weight: 500;
+    }
+    .chip[aria-pressed="true"] { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .chip.sev-critical[aria-pressed="true"] { background: var(--crit); border-color: var(--crit); }
+    .chip.sev-high[aria-pressed="true"] { background: var(--high); border-color: var(--high); }
+    .chip.sev-medium[aria-pressed="true"] { background: var(--med); border-color: var(--med); }
+    .chip.sev-low[aria-pressed="true"] { background: var(--low); border-color: var(--low); }
+    .find-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .find-table th, .find-table td { text-align: left; padding: 0.55rem 0.45rem; border-bottom: 1px solid var(--line); }
+    .find-table th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .find-table tr { cursor: pointer; transition: background 0.12s ease; }
+    .find-table tr:hover, .find-table tr.is-active { background: rgba(26,158,143,0.08); }
+    .find-table tr[hidden] { display: none; }
+    .badge {
+      display: inline-block; border-radius: 999px; padding: 0.15rem 0.5rem;
+      font-size: 0.75rem; font-weight: 650; color: #fff; text-transform: lowercase;
+    }
+    .badge.critical { background: var(--crit); }
+    .badge.high { background: var(--high); }
+    .badge.medium { background: var(--med); }
+    .badge.low { background: var(--low); }
+    .badge.info { background: var(--info); }
+    .find-detail {
+      margin-top: 0.85rem; border: 1px solid var(--line); border-radius: 12px;
+      padding: 0.9rem 1rem; background: #f7fbfb; display: none;
+    }
+    .find-detail.is-open { display: block; animation: rise 0.25s ease both; }
+    .find-detail h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
+    .find-detail p { margin: 0.35rem 0; color: var(--muted); }
+
+    /* Terminal recipes */
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.85rem; }
+    .tab {
+      border: 1px solid var(--line); background: #fff; color: var(--ink);
+      border-radius: 999px; padding: 0.45rem 0.85rem; font-size: 0.85rem; cursor: pointer;
+    }
+    .tab[aria-selected="true"] { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .terminal {
+      border: 1px solid #16333c; background: #0b1c22; color: #d7ebe7;
+      border-radius: 12px; padding: 1rem 1.1rem;
+      font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86rem;
+      box-shadow: var(--shadow); overflow-x: auto; min-height: 8.5rem;
+    }
+    .terminal .prompt { color: var(--accent); }
+    .terminal .cmd { color: #fff; }
+    .terminal .out { color: #f0c36a; }
+    .terminal .caret {
+      display: inline-block; width: 0.55ch; height: 1em; margin-left: 1px;
+      background: #f0c36a; vertical-align: text-bottom;
+      animation: blink 1s steps(1) infinite;
+    }
+    .panel[hidden] { display: none; }
+    .copy-row { margin-top: 0.85rem; display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center; }
+    .muted { color: var(--muted); font-size: 0.88rem; }
+
+    /* OWASP */
+    .owasp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.5rem;
+    }
+    .owasp-cell {
+      border: 1px solid var(--line); border-radius: 12px;
+      padding: 0.7rem 0.75rem; background: #f7fbfb;
+      cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease;
+      text-align: left;
+    }
+    .owasp-cell:hover { transform: translateY(-2px); border-color: rgba(26,158,143,0.45); }
+    .owasp-cell[aria-pressed="true"] { border-color: var(--brand); background: var(--accent-soft); }
+    .owasp-cell .id { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--accent); }
+    .owasp-cell strong { display: block; font-size: 0.86rem; margin: 0.2rem 0; }
+    .owasp-cell .st { font-size: 0.78rem; color: var(--muted); }
+    .owasp-note {
+      margin-top: 0.85rem; padding: 0.85rem 1rem;
+      border-radius: 12px; background: rgba(26,158,143,0.08);
+      border-left: 3px solid var(--accent);
+    }
+
+    .shots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0.85rem;
+    }
+    .shots figure {
+      margin: 0; border: 1px solid var(--line); background: #fff;
+      border-radius: 12px; padding: 0.5rem; overflow: hidden;
+      transition: transform 0.15s ease;
+    }
+    .shots figure:hover { transform: translateY(-2px); }
+    .shots img { width: 100%; height: auto; display: block; border-radius: 8px; }
+    .shots figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 0.45rem; padding: 0 0.2rem 0.15rem; }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.65rem;
+    }
+    .team-tile {
+      border: 1px solid var(--line); background: rgba(255,255,255,0.85);
+      border-radius: 12px; padding: 0.95rem 1rem;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .team-tile:hover { transform: translateY(-2px); border-color: rgba(26,158,143,0.45); }
+    .team-tile h3 { margin: 0 0 0.25rem; font-size: 0.98rem; }
+    .team-tile p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+
+    .warn {
+      margin-top: 2rem;
+      border-left: 4px solid var(--amber);
+      background: var(--amber-soft);
+      padding: 0.95rem 1.05rem;
+      border-radius: 0 12px 12px 0;
+      color: #5c4300;
+    }
+    .kbd-hint {
+      margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted);
+    }
+    kbd {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.78rem;
+      border: 1px solid var(--line); background: #fff;
+      border-radius: 6px; padding: 0.1rem 0.35rem;
+    }
+    footer {
+      margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: 0.88rem;
+      display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between;
+    }
+    .back-top {
+      position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 40;
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid var(--line); background: #fff; color: var(--brand);
+      box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+    .back-top.show { opacity: 1; pointer-events: auto; }
+    .back-top:hover { transform: translateY(-2px); }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @keyframes floaty { from { transform: translateY(0); } to { transform: translateY(-18px); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    @media (max-width: 860px) {
+      .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mod-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .pipeline { grid-template-columns: 1fr; }
+      .hero { min-height: auto; }
+      .nav-links { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <nav class="topnav" aria-label="Primary">
+      <div class="brand">VULNSIGHT</div>
+      <div class="nav-links">
+        <a href="#pipeline" data-nav>Pipeline</a>
+        <a href="#modules" data-nav>Modules</a>
+        <a href="#theater" data-nav>Scan theater</a>
+        <a href="#findings" data-nav>Findings</a>
+        <a href="#try" data-nav>Commands</a>
+        <a href="#owasp" data-nav>OWASP</a>
+        <a href="#demo" data-nav>Demo</a>
+        <a href="#team" data-nav>Group 3</a>
+        <a href="https://github.com/epedev/VulnSightz" rel="noopener">GitHub</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-orbit" aria-hidden="true"><span></span></div>
+      <div class="hero-kicker">Group 3 · authorized assessment tool</div>
+      <h1>VulnSight</h1>
+      <p class="tagline">see the weakness · prove the risk</p>
+      <p>
+        Modular CLI scanner for authorized local assessments — recon, XSS, injection,
+        access control, hygiene checks, and interactive HTML reporting.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#theater">Run the scan theater</a>
+        <a class="btn btn-ghost" href="#try">Copy install commands</a>
+        <a class="btn btn-ghost" href="ARCHITECTURE.md">Architecture</a>
+      </div>
+    </header>
+
+    <section class="section" id="pipeline">
+      <h2>Interactive assessment pipeline</h2>
+      <p class="lead">Click a stage to see what VulnSight does — from authorization to a filterable report.</p>
+      <div class="panel">
+        <div class="pipeline" role="toolbar" aria-label="Pipeline stages">
+          <button type="button" class="pipe-step" data-pipe="0" aria-pressed="true"><span class="n">01</span><strong>Authorize</strong></button>
+          <button type="button" class="pipe-step" data-pipe="1" aria-pressed="false"><span class="n">02</span><strong>Recon</strong></button>
+          <button type="button" class="pipe-step" data-pipe="2" aria-pressed="false"><span class="n">03</span><strong>Detect</strong></button>
+          <button type="button" class="pipe-step" data-pipe="3" aria-pressed="false"><span class="n">04</span><strong>Normalize</strong></button>
+          <button type="button" class="pipe-step" data-pipe="4" aria-pressed="false"><span class="n">05</span><strong>Report</strong></button>
+        </div>
+        <div class="pipe-detail" id="pipe-detail" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section" id="modules">
+      <h2>Module explorer</h2>
+      <p class="lead">Each detector stays independently testable and speaks a shared findings contract.</p>
+      <div class="mod-grid">
+        <div class="mod-list" id="mod-list" role="listbox" aria-label="Detection modules"></div>
+        <div class="mod-stage" id="mod-stage" aria-live="polite">
+          <div class="glow" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="theater">
+      <h2>Scan theater</h2>
+      <p class="lead">A safe, simulated walkthrough of a full VulnSight run — no network calls, just the story of the pipeline.</p>
+      <div class="panel">
+        <div class="theater-head">
+          <div>
+            <strong>Authorized target</strong>
+            <div class="mono muted">http://127.0.0.1:5001</div>
+          </div>
+          <div class="cta-row">
+            <button type="button" class="btn btn-solid" id="theater-run">Play scan</button>
+            <button type="button" class="btn btn-soft" id="theater-reset">Reset</button>
+          </div>
+        </div>
+        <div class="theater-log" id="theater-log" aria-live="polite">
+          <div class="dim">Press “Play scan” to animate the pipeline.</div>
+        </div>
+        <div class="bars" id="theater-bars" hidden></div>
+      </div>
+    </section>
+
+    <section class="section" id="findings">
+      <h2>Findings playground</h2>
+      <p class="lead">Filter sample findings the same way the HTML report does — severity chips, row focus, expandable detail.</p>
+      <div class="panel">
+        <div class="toolbar" role="toolbar" aria-label="Filter sample findings">
+          <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="chip sev-critical" data-filter="critical" aria-pressed="false">Critical</button>
+          <button type="button" class="chip sev-high" data-filter="high" aria-pressed="false">High</button>
+          <button type="button" class="chip sev-medium" data-filter="medium" aria-pressed="false">Medium</button>
+          <button type="button" class="chip sev-low" data-filter="low" aria-pressed="false">Low</button>
+          <input class="chip" id="find-search" type="search" placeholder="Search…" aria-label="Search sample findings" style="flex:1;min-width:10rem;border-radius:999px;cursor:text;">
+        </div>
+        <p class="muted" id="filter-count"></p>
+        <div style="overflow-x:auto;">
+          <table class="find-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Module</th>
+                <th>CWE</th>
+              </tr>
+            </thead>
+            <tbody id="find-body"></tbody>
+          </table>
+        </div>
+        <div class="find-detail" id="find-detail"></div>
+      </div>
+    </section>
+
+    <section class="section" id="try">
+      <h2>Command recipes</h2>
+      <p class="lead">Pick a recipe — watch it type into the terminal, then copy it in one click.</p>
+      <div class="tabs" role="tablist" aria-label="Command recipes">
+        <button class="tab" role="tab" aria-selected="true" data-panel="install">Install</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="project">Authorize</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="scan">Scan</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="doctor">Doctor</button>
+        <button class="tab" role="tab" aria-selected="false" data-panel="compare">Compare</button>
+      </div>
+      <pre class="terminal" id="term" aria-live="polite"></pre>
+      <div class="copy-row">
+        <button class="btn btn-primary" type="button" id="copy-btn">Copy commands</button>
+        <button class="btn btn-soft" type="button" id="retype-btn">Replay typing</button>
+        <span class="muted" id="copy-status"></span>
+      </div>
+      <p class="kbd-hint">Keyboard: <kbd>1</kbd>–<kbd>5</kbd> switch recipes · <kbd>C</kbd> copy · <kbd>P</kbd> play theater</p>
+    </section>
+
+    <section class="section" id="owasp">
+      <h2>OWASP Top 10:2025 map</h2>
+      <p class="lead">Click a category to see how VulnSight coverage maps for the 2024–2026 cycle.</p>
+      <div class="panel">
+        <div class="owasp-grid" id="owasp-grid"></div>
+        <div class="owasp-note" id="owasp-note" aria-live="polite"></div>
+        <p style="margin:0.9rem 0 0;"><a href="OWASP_TOP10.md">Full OWASP mapping notes →</a></p>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <h2>Live demonstration artifacts</h2>
+      <p class="lead">Authorized local scan and the interactive HTML report VulnSight produces.</p>
+      <div class="shots">
+        <figure>
+          <img src="images/demo-scan-terminals.png" alt="VulnSight scan running beside the local target application" loading="lazy">
+          <figcaption>Full scan against an authorized local target</figcaption>
+        </figure>
+        <figure>
+          <img src="images/demo-report-summary.png" alt="VulnSight HTML report cover with export controls and executive summary" loading="lazy">
+          <figcaption>Report cover with PDF/Markdown/JSON export</figcaption>
+        </figure>
+        <figure>
+          <img src="images/demo-report-modules.png" alt="VulnSight executive summary with severity and module distribution" loading="lazy">
+          <figcaption>Severity and source-module distribution from a live scan</figcaption>
+        </figure>
+        <figure>
+          <img src="images/demo-report-owasp.png" alt="OWASP Top 10:2025 coverage table in the VulnSight report" loading="lazy">
+          <figcaption>OWASP Top 10:2025 coverage (2024–2026 cycle)</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="team">
+      <h2>Group 3</h2>
+      <p class="lead">Graduation project team — five modules, one coherent scanner.</p>
+      <div class="team-grid">
+        <article class="team-tile"><h3>Kenean Amare Eshetu</h3><p>CTC-4837-26</p></article>
+        <article class="team-tile"><h3>Kenneti Hailu Dange</h3><p>CTC-535-26</p></article>
+        <article class="team-tile"><h3>Kidsit Ephrem</h3><p>CTC-6744-26</p></article>
+        <article class="team-tile"><h3>Alazar Elias Digafe</h3><p>CTC-631-26</p></article>
+        <article class="team-tile"><h3>Firaol Mustefa Gossa</h3><p>CTC-4301-26</p></article>
+      </div>
+    </section>
+
+    <div class="warn" role="note">
+      <strong>Authorized use only.</strong> VulnSight does not ship a vulnerable target.
+      Scan only systems you own or have explicit written permission to test.
+      The scan theater on this page is a local animation and never sends traffic.
+    </div>
+
+    <footer>
+      <span>VulnSight · see the weakness · prove the risk</span>
+      <span>
+        <a href="../LICENSE">MIT</a> ·
+        <a href="USAGE.md">Usage</a> ·
+        <a href="SECURITY.md">Security</a> ·
+        <a href="https://github.com/epedev/VulnSightz">epedev/VulnSightz</a>
+      </span>
+    </footer>
+  </div>
+
+  <button type="button" class="back-top" id="back-top" aria-label="Back to top">↑</button>
+
+  <script>
+    const PIPE = [
+      {
+        title: "Authorize",
+        body: "init-project writes an explicit permission file. Scans refuse to start without a clear authorized target and operator statement."
+      },
+      {
+        title: "Recon",
+        body: "The same-origin crawler builds crawl_map.json — pages, forms, parameters, and links — under a page/request budget."
+      },
+      {
+        title: "Detect",
+        body: "XSS, SQLi, command injection, access control, and misconfig modules probe in parallel-friendly isolation with shared Finding models."
+      },
+      {
+        title: "Normalize",
+        body: "Reporting ingests module JSON, deduplicates conservatively, scores CVSS when possible, and maps OWASP Top 10:2025 labels."
+      },
+      {
+        title: "Report",
+        body: "Self-contained HTML with sticky filters, accordion details, OWASP coverage, plus Markdown / PDF / JSON exports."
+      }
+    ];
+
+    const MODULES = [
+      {
+        id: "crawler",
+        name: "Crawler",
+        tag: "Recon",
+        blurb: "Same-origin discovery with scope enforcement.",
+        detail: "Walks your authorized origin only. Emits pages, forms, query params, and links into crawl_map.json for every detector.",
+        bullets: ["Loopback-first defaults", "Page + request budgets", "Feeds all detectors"]
+      },
+      {
+        id: "xss",
+        name: "XSS",
+        tag: "Inject",
+        blurb: "Marker-first reflected & stored analysis.",
+        detail: "Places unique markers, classifies render context, and only escalates when verification is earned — including inert JSON script types.",
+        bullets: ["Context-aware classification", "Optional browser verify", "Honest confidence levels"]
+      },
+      {
+        id: "sqli",
+        name: "SQLi / Cmd",
+        tag: "Inject",
+        blurb: "Bounded injection checks with evidence discipline.",
+        detail: "Error/boolean/time signals for SQL injection and simulated command-injection labs — never claims OS shell without proof.",
+        bullets: ["Crawl-map driven", "Noise-aware signals", "Probable vs confirmed"]
+      },
+      {
+        id: "access",
+        name: "Access control",
+        tag: "AuthZ",
+        blurb: "IDOR and broken access control probes.",
+        detail: "Compares object access across roles and unauthenticated paths to surface authorization boundary failures.",
+        bullets: ["IDOR candidates", "Role mismatch checks", "BAC fallbacks"]
+      },
+      {
+        id: "misconfig",
+        name: "Misconfig",
+        tag: "Hygiene",
+        blurb: "Headers, cookies, CSRF, redirect, SSRF signals.",
+        detail: "Passive and light-active hygiene checks that catch missing defenses and dangerous redirect/SSRF parameter patterns.",
+        bullets: ["Security headers", "Cookie flags", "Open redirect probes"]
+      },
+      {
+        id: "report",
+        name: "Reporting",
+        tag: "Output",
+        blurb: "CVSS, OWASP:2025, interactive HTML.",
+        detail: "Canonical schema, conservative dedupe, filterable HTML report, Markdown/PDF/JSON — with incomplete-assessment honesty.",
+        bullets: ["OWASP Top 10:2025", "Severity filters", "Export buttons"]
+      }
+    ];
+
+    const FINDINGS = [
+      { id: "1", title: "Reflected XSS in search", severity: "high", module: "xss", cwe: "CWE-79", detail: "User input reflected without contextual encoding. Marker confirmed in HTML body context." },
+      { id: "2", title: "SQLi login bypass candidate", severity: "critical", module: "sqli", cwe: "CWE-89", detail: "Authentication query appears to concatenate untrusted input. Boolean differential observed." },
+      { id: "3", title: "IDOR on /orders/{id}", severity: "high", module: "access_control", cwe: "CWE-639", detail: "Changing the object id returned another user's order without authorization checks." },
+      { id: "4", title: "Missing Content-Security-Policy", severity: "medium", module: "misconfig", cwe: "CWE-693", detail: "Response lacks CSP, weakening defense-in-depth against XSS impact." },
+      { id: "5", title: "Open redirect via next=", severity: "medium", module: "misconfig", cwe: "CWE-601", detail: "External URL accepted in redirect parameter; Location pointed off-origin." },
+      { id: "6", title: "Cookie missing HttpOnly", severity: "low", module: "misconfig", cwe: "CWE-1004", detail: "Session cookie readable by script if XSS is present." },
+      { id: "7", title: "Command injection (lab simulation)", severity: "high", module: "command_injection", cwe: "CWE-78", detail: "Simulated timing/output signal on a training endpoint — marked probable, not OS-shell confirmed." }
+    ];
+
+    const OWASP = [
+      { id: "A01:2025", name: "Broken Access Control", status: "active coverage", note: "Access-control module + open-redirect checks contribute findings here." },
+      { id: "A02:2025", name: "Security Misconfiguration", status: "active coverage", note: "Missing headers, cookie flags, CSRF candidates, and disclosure signals." },
+      { id: "A03:2025", name: "Software Supply Chain Failures", status: "limited", note: "Not a primary VulnSight detector focus for local lab assessments." },
+      { id: "A04:2025", name: "Cryptographic Failures", status: "partial", note: "HSTS absence on HTTPS targets is mapped here when applicable." },
+      { id: "A05:2025", name: "Injection", status: "active coverage", note: "XSS, SQLi, and command-injection modules map into Injection." },
+      { id: "A06:2025", name: "Insecure Design", status: "limited", note: "Design flaws need human review; scanner findings may only hint." },
+      { id: "A07:2025", name: "Authentication Failures", status: "partial", note: "Login SQLi bypass signals can indicate auth weaknesses." },
+      { id: "A08:2025", name: "Software or Data Integrity Failures", status: "limited", note: "Outside core local-lab detector scope." },
+      { id: "A09:2025", name: "Security Logging & Alerting Failures", status: "limited", note: "Not directly tested; absence of logs is not inferred." },
+      { id: "A10:2025", name: "Mishandling of Exceptional Conditions", status: "partial", note: "Verbose error / disclosure style findings may map here." }
+    ];
+
+    const RECIPES = {
+      install: [
+        ["$", "git clone https://github.com/epedev/VulnSightz.git && cd VulnSightz"],
+        ["$", "python3 -m venv .venv && source .venv/bin/activate"],
+        ["$", "pip install -e \".[dev]\""],
+        ["✔", "RESULT: ready — you can run vulnsight scan"]
+      ],
+      project: [
+        ["$", "vulnsight init-project -o myproject.json --target http://127.0.0.1:5001"],
+        ["$", "# edit authorization.authorized_by"],
+        ["✔", "wrote authorized project file → myproject.json"]
+      ],
+      scan: [
+        ["$", "vulnsight scan --project myproject.json"],
+        ["✔", "SCAN BRIEF → modules engaged → HTML report written"],
+        ["$", "xdg-open reports/vulnsight_report.html  # or open on macOS/Windows"]
+      ],
+      doctor: [
+        ["$", "vulnsight doctor"],
+        ["✔", "Python · modules · imports · ready"],
+        ["$", "vulnsight docs   # opens this interactive page"]
+      ],
+      compare: [
+        ["$", "vulnsight compare \\"],
+        [" ", "  --current reports/findings.json \\"],
+        [" ", "  --baseline fixtures/secure_baseline_findings.json \\"],
+        [" ", "  --output reports"],
+        ["✔", "compare_report.md + compare_report.json"]
+      ]
+    };
+
+    /* ---------- Pipeline ---------- */
+    const pipeDetail = document.getElementById("pipe-detail");
+    const pipeSteps = [...document.querySelectorAll(".pipe-step")];
+    function showPipe(i) {
+      pipeSteps.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.pipe === String(i))));
+      const step = PIPE[i];
+      pipeDetail.innerHTML = `<h3>${step.title}</h3><p>${step.body}</p>`;
+    }
+    pipeSteps.forEach((b) => b.addEventListener("click", () => showPipe(Number(b.dataset.pipe))));
+    showPipe(0);
+
+    /* ---------- Modules ---------- */
+    const modList = document.getElementById("mod-list");
+    const modStage = document.getElementById("mod-stage");
+    function showModule(mod) {
+      [...modList.querySelectorAll(".mod-btn")].forEach((b) => {
+        b.setAttribute("aria-pressed", String(b.dataset.id === mod.id));
+      });
+      modStage.innerHTML = `
+        <div class="glow" aria-hidden="true"></div>
+        <h3>${mod.tag} · ${mod.name}</h3>
+        <p>${mod.detail}</p>
+        <ul>${mod.bullets.map((x) => `<li>${x}</li>`).join("")}</ul>`;
+    }
+    MODULES.forEach((mod, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "mod-btn";
+      btn.dataset.id = mod.id;
+      btn.setAttribute("role", "option");
+      btn.setAttribute("aria-pressed", String(idx === 0));
+      btn.innerHTML = `<span class="dot" aria-hidden="true"></span><span><strong>${mod.name}</strong><span>${mod.blurb}</span></span>`;
+      btn.addEventListener("click", () => showModule(mod));
+      modList.appendChild(btn);
+    });
+    showModule(MODULES[0]);
+
+    /* ---------- Scan theater ---------- */
+    const theaterLog = document.getElementById("theater-log");
+    const theaterBars = document.getElementById("theater-bars");
+    let theaterTimer = null;
+    const THEATER_STEPS = [
+      { t: "scope", html: `<span class="dim">$</span> validating authorization · <span class="ok">loopback OK</span>` },
+      { t: "crawl", html: `<span class="run">▸ crawler</span> mapping origin… <span class="ok">18 pages</span>` },
+      { t: "xss", html: `<span class="run">▸ xss</span> markers + context… <span class="ok">2 candidates</span>` },
+      { t: "sqli", html: `<span class="run">▸ sqli / cmd</span> bounded probes… <span class="ok">1 probable</span>` },
+      { t: "access", html: `<span class="run">▸ access_control</span> object checks… <span class="ok">1 IDOR</span>` },
+      { t: "misc", html: `<span class="run">▸ misconfig</span> headers + cookies… <span class="ok">3 hygiene</span>` },
+      { t: "report", html: `<span class="run">▸ reporting</span> normalize · CVSS · OWASP… <span class="ok">HTML ready</span>` },
+      { t: "done", html: `<span class="ok">✔ SCAN COMPLETE</span> → reports/vulnsight_report.html` }
+    ];
+    function resetTheater() {
+      if (theaterTimer) { clearTimeout(theaterTimer); theaterTimer = null; }
+      theaterLog.innerHTML = `<div class="dim">Press “Play scan” to animate the pipeline.</div>`;
+      theaterBars.hidden = true;
+      theaterBars.innerHTML = "";
+    }
+    function playTheater() {
+      resetTheater();
+      theaterLog.innerHTML = "";
+      theaterBars.hidden = false;
+      const mods = [
+        ["crawler", 100], ["xss", 72], ["sqli", 55], ["access_control", 40], ["misconfig", 88], ["reporting", 100]
+      ];
+      theaterBars.innerHTML = mods.map(([name]) => `
+        <div class="bar-row">
+          <span class="mono">${name}</span>
+          <div class="bar-track"><div class="bar-fill" data-mod="${name}"></div></div>
+          <span class="mono" data-pct="${name}">0%</span>
+        </div>`).join("");
+      let i = 0;
+      const tick = () => {
+        if (i >= THEATER_STEPS.length) return;
+        const row = document.createElement("div");
+        row.innerHTML = THEATER_STEPS[i].html;
+        theaterLog.appendChild(row);
+        theaterLog.scrollTop = theaterLog.scrollHeight;
+        const fillIdx = Math.min(i, mods.length - 1);
+        if (i < mods.length) {
+          const [name, pct] = mods[fillIdx];
+          const el = theaterBars.querySelector(`[data-mod="${name}"]`);
+          const label = theaterBars.querySelector(`[data-pct="${name}"]`);
+          if (el) el.style.width = pct + "%";
+          if (label) label.textContent = pct + "%";
+        }
+        if (i === THEATER_STEPS.length - 1) {
+          mods.forEach(([name, pct]) => {
+            const el = theaterBars.querySelector(`[data-mod="${name}"]`);
+            const label = theaterBars.querySelector(`[data-pct="${name}"]`);
+            if (el) el.style.width = pct + "%";
+            if (label) label.textContent = pct + "%";
+          });
+        }
+        i += 1;
+        theaterTimer = setTimeout(tick, 520);
+      };
+      tick();
+    }
+    document.getElementById("theater-run").addEventListener("click", playTheater);
+    document.getElementById("theater-reset").addEventListener("click", resetTheater);
+
+    /* ---------- Findings playground ---------- */
+    const findBody = document.getElementById("find-body");
+    const findDetail = document.getElementById("find-detail");
+    const filterCount = document.getElementById("filter-count");
+    const filterChips = [...document.querySelectorAll(".chip[data-filter]")];
+    const findSearch = document.getElementById("find-search");
+    let sevFilter = "all";
+
+    FINDINGS.forEach((f) => {
+      const tr = document.createElement("tr");
+      tr.dataset.severity = f.severity;
+      tr.dataset.search = `${f.title} ${f.module} ${f.cwe}`.toLowerCase();
+      tr.innerHTML = `
+        <td>${f.title}</td>
+        <td><span class="badge ${f.severity}">${f.severity}</span></td>
+        <td class="mono">${f.module}</td>
+        <td class="mono">${f.cwe}</td>`;
+      tr.addEventListener("click", () => {
+        [...findBody.querySelectorAll("tr")].forEach((r) => r.classList.remove("is-active"));
+        tr.classList.add("is-active");
+        findDetail.classList.add("is-open");
+        findDetail.innerHTML = `
+          <h3>${f.title}</h3>
+          <p><span class="badge ${f.severity}">${f.severity}</span> · <span class="mono">${f.module}</span> · <span class="mono">${f.cwe}</span></p>
+          <p>${f.detail}</p>
+          <p class="muted">Sample data for docs only — generate a real report with <span class="mono">vulnsight scan</span>.</p>`;
+      });
+      findBody.appendChild(tr);
+    });
+
+    function applyFindFilter() {
+      const q = (findSearch.value || "").trim().toLowerCase();
+      let visible = 0;
+      [...findBody.querySelectorAll("tr")].forEach((tr) => {
+        const sevOk = sevFilter === "all" || tr.dataset.severity === sevFilter;
+        const textOk = !q || (tr.dataset.search || "").includes(q);
+        const show = sevOk && textOk;
+        tr.hidden = !show;
+        if (show) visible += 1;
+      });
+      filterCount.textContent = `${visible} of ${FINDINGS.length} sample finding(s) visible`;
+    }
+    filterChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        sevFilter = chip.dataset.filter;
+        filterChips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+        applyFindFilter();
+      });
+    });
+    findSearch.addEventListener("input", applyFindFilter);
+    applyFindFilter();
+
+    /* ---------- OWASP ---------- */
+    const owaspGrid = document.getElementById("owasp-grid");
+    const owaspNote = document.getElementById("owasp-note");
+    function showOwasp(item) {
+      [...owaspGrid.querySelectorAll(".owasp-cell")].forEach((c) => {
+        c.setAttribute("aria-pressed", String(c.dataset.id === item.id));
+      });
+      owaspNote.innerHTML = `<strong>${item.id} — ${item.name}</strong><br>${item.note} <span class="muted">(${item.status})</span>`;
+    }
+    OWASP.forEach((item, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "owasp-cell";
+      btn.dataset.id = item.id;
+      btn.setAttribute("aria-pressed", String(idx === 4));
+      btn.innerHTML = `<div class="id">${item.id}</div><strong>${item.name}</strong><div class="st">${item.status}</div>`;
+      btn.addEventListener("click", () => showOwasp(item));
+      owaspGrid.appendChild(btn);
+    });
+    showOwasp(OWASP[4]);
+
+    /* ---------- Terminal typing ---------- */
+    const term = document.getElementById("term");
+    const tabs = [...document.querySelectorAll(".tab")];
+    let activePanel = "install";
+    let typeTimer = null;
+    let typedPlain = "";
+
+    function recipePlain(key) {
+      return RECIPES[key].map(([p, c]) => (p === "$" ? "$ " + c : p === "✔" ? "✔ " + c : "  " + c)).join("\n");
+    }
+
+    function renderTyped(key, animate) {
+      if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
+      const lines = RECIPES[key];
+      typedPlain = recipePlain(key);
+      if (!animate) {
+        term.innerHTML = lines.map(([p, c]) => {
+          if (p === "$") return `<span class="prompt">$</span> <span class="cmd">${escapeHtml(c)}</span>`;
+          if (p === "✔") return `<span class="out">✔ ${escapeHtml(c)}</span>`;
+          return `<span class="dim">  ${escapeHtml(c)}</span>`;
+        }).join("\n");
+        return;
+      }
+      term.innerHTML = "";
+      let li = 0, ci = 0;
+      const step = () => {
+        if (li >= lines.length) return;
+        const [p, c] = lines[li];
+        if (ci === 0) {
+          const row = document.createElement("div");
+          if (p === "$") row.innerHTML = `<span class="prompt">$</span> <span class="cmd"></span><span class="caret"></span>`;
+          else if (p === "✔") row.innerHTML = `<span class="out"></span><span class="caret"></span>`;
+          else row.innerHTML = `<span class="dim">  </span><span class="cmd"></span><span class="caret"></span>`;
+          term.appendChild(row);
+        }
+        const row = term.lastElementChild;
+        const target = row.querySelector(".cmd, .out");
+        const caret = row.querySelector(".caret");
+        if (ci <= c.length) {
+          if (p === "✔") target.textContent = "✔ " + c.slice(0, ci);
+          else target.textContent = c.slice(0, ci);
+          ci += 1;
+          typeTimer = setTimeout(step, 12 + Math.random() * 18);
+        } else {
+          if (caret) caret.remove();
+          li += 1; ci = 0;
+          typeTimer = setTimeout(step, 180);
+        }
+      };
+      step();
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[ch]);
+    }
+
+    function selectTab(key) {
+      activePanel = key;
+      tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.panel === key)));
+      renderTyped(key, true);
+      document.getElementById("copy-status").textContent = "";
+    }
+    tabs.forEach((tab) => tab.addEventListener("click", () => selectTab(tab.dataset.panel)));
+    selectTab("install");
+
+    document.getElementById("copy-btn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(typedPlain || recipePlain(activePanel));
+        document.getElementById("copy-status").textContent = "Copied to clipboard.";
+      } catch {
+        document.getElementById("copy-status").textContent = "Select the terminal and copy manually.";
+      }
+    });
+    document.getElementById("retype-btn").addEventListener("click", () => renderTyped(activePanel, true));
+
+    /* ---------- Nav active + back top + keys ---------- */
+    const navLinks = [...document.querySelectorAll("[data-nav]")];
+    const sections = navLinks.map((a) => document.querySelector(a.getAttribute("href"))).filter(Boolean);
+    const backTop = document.getElementById("back-top");
+    const onScroll = () => {
+      const y = window.scrollY + 120;
+      let current = sections[0];
+      for (const sec of sections) {
+        if (sec.offsetTop <= y) current = sec;
+      }
+      navLinks.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === "#" + current.id));
+      backTop.classList.toggle("show", window.scrollY > 500);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    onScroll();
+
+    window.addEventListener("keydown", (e) => {
+      if (e.target.matches("input, textarea")) return;
+      const keys = { "1": "install", "2": "project", "3": "scan", "4": "doctor", "5": "compare" };
+      if (keys[e.key]) { selectTab(keys[e.key]); document.getElementById("try").scrollIntoView({ behavior: "smooth" }); }
+      if (e.key === "c" || e.key === "C") document.getElementById("copy-btn").click();
+      if (e.key === "p" || e.key === "P") {
+        document.getElementById("theater").scrollIntoView({ behavior: "smooth" });
+        playTheater();
+      }
+    });
+  </script>
+</body>
+</html>
