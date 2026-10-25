@@ -8,7 +8,7 @@ VulnSight is a Python command-line tool that we, Group 3, built to run selected 
 
 We developed it as our INSA Summer Camp graduation project (version 0.2.0, Python 3.10+, MIT license). Its main value is educational: it shows how separate scanner modules can cooperate, how their observations become a common finding format, and how technical results can be presented for review and remediation.
 
-We want to be clear about what VulnSight is not. It is not a complete penetration-testing platform, and it cannot guarantee that an application is secure. We did not include a deliberately vulnerable target website, so the operator must prepare a local lab or provide another explicitly authorized target. We recommend starting with a loopback target such as `http://127.0.0.1:5001`.
+We want to be clear about what VulnSight is not. It is not a complete penetration-testing platform, and it cannot guarantee that an application is secure. We did not include a deliberately vulnerable target website, so the operator must prepare a local lab or provide another explicitly authorized target. We recommend starting with a loopback target such as `http://127.0.0.1:5000`.
 
 ## 2. Background and Problem Statement
 
