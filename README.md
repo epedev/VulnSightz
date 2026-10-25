@@ -177,7 +177,7 @@ vulnsight compare \
 
 | Document | Description |
 |----------|-------------|
-| [Interactive docs](https://epedev.github.io/VulnSightz/) | Pipeline explorer, scan theater, findings playground (`vulnsight docs`) |
+| [Interactive docs](https://epedev.github.io/VulnSightz) | Pipeline explorer, scan theater, findings playground (`vulnsight docs`) |
 | [docs/index.html](docs/index.html) | Same showcase, offline |
 | [docs/USAGE.md](docs/USAGE.md) | CLI usage |
 | [docs/INSTALLATION.md](docs/INSTALLATION.md) | Setup notes |
