@@ -178,8 +178,8 @@ vulnsight compare \
 | Document | Description |
 |----------|-------------|
 | [Interactive docs](https://epedev.github.io/VulnSightz) | Pipeline explorer, scan theater, findings playground (`vulnsight docs`) |
-| [Demo video] | [Watch the recorded demonstration](Assets/video/vulnsight_test.mp4) |
-| [Documentation](Assets/documentation/VulnSight_Project_Documentation.md) | [Vulnsight Final Documentation]
+| [Demo video](Assets/Video/vulnsight_test.mp4)[Watch the recorded demonstration] |
+| [Documentation](Assets/Documentation/VulnSight_Project_Documentation.md) | [Vulnsight Final Documentation]
 | [docs/index.html](docs/index.html) | Same showcase, offline |
 | [docs/USAGE.md](docs/USAGE.md) | CLI usage |
 | [docs/INSTALLATION.md](docs/INSTALLATION.md) | Setup notes |
