@@ -79,11 +79,11 @@ vulnsight doctor
 ## Quick start
 
 ```bash
-# 1. Start a local website under test on http://127.0.0.1:5001
+# 1. Start a local website under test on http://127.0.0.1:5000
 #    (the bundled lab works: see the next section)
 
 # 2. Create an authorization project file
-vulnsight init-project -o myproject.json --target http://127.0.0.1:5001
+vulnsight init-project -o myproject.json --target http://127.0.0.1:5000
 #    then set authorization.authorized_by in myproject.json
 
 # 3. Run the full pipeline
