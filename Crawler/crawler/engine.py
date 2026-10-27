@@ -255,11 +255,16 @@ class CrawlerEngine:
         return out
 
     def _fetch(self, url: str) -> tuple[str, int, str, str]:
+        import time
+
         timeout = (self.config.connect_timeout, self.config.timeout)
         # Manual redirect handling for per-hop scope checks
         current = url
         history = 0
         while True:
+            delay = float(getattr(self.config, "request_delay_seconds", 0.0) or 0.0)
+            if delay > 0:
+                time.sleep(delay)
             resp = self.session.get(
                 current, timeout=timeout, allow_redirects=False, stream=True
             )
