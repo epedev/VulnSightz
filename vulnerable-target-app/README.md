@@ -1,6 +1,6 @@
 # Vulnerable Target App
 
-A deliberately vulnerable Flask application for **authorized, local web-security training** and testing the companion `webvuln-scanner` project. It provides a small set of routes with known security flaws so a crawler and scanner can be tested against a predictable target.
+A deliberately vulnerable Flask application for **authorized, local web-security training** and testing the companion [VulnSight](../README.md) scanner. It provides a small set of routes with known security flaws so a crawler and scanner can be tested against a predictable target.
 
 > **Safety:** This application intentionally contains exploitable vulnerabilities, including OS command injection. Run it only on your own machine or inside an isolated lab. Do not expose it to a public network, deploy it to production, or use the test techniques against systems without explicit authorization.
 

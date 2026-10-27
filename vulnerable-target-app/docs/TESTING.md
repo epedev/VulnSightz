@@ -24,7 +24,7 @@ Visit the login, search, comments, profile, admin, and ping pages. Record the re
 
 ## 4. Validate scanner behavior
 
-When using the companion scanner, configure its target as `http://127.0.0.1:5001` and confirm that the scope is limited to this local application. A useful report should include the affected route and parameter, evidence that is safe to reproduce, the likely impact, severity rationale, and a concrete remediation. Avoid reporting a finding solely because a keyword or response string matched; verify the behavior and document false positives.
+When using VulnSight, configure its target as `http://127.0.0.1:5001` and confirm that the scope is limited to this local application. A useful report should include the affected route and parameter, evidence that is safe to reproduce, the likely impact, severity rationale, and a concrete remediation. Avoid reporting a finding solely because a keyword or response string matched; verify the behavior and document false positives.
 
 ## 5. Reset after testing
 
