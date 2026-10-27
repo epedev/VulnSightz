@@ -1,8 +1,15 @@
 # SQL Injection & Command Injection Module
 
+This module prepared for authorized lab or localhost that the sight u own and we build this for our graduation project. 
+and you don't have to try it in unauthorized website.
+
 VulnSight detectors for SQL injection and OS command injection against an intentionally vulnerable local Flask training application.
 
 Findings use the shared schema from `xss_module/scanner/models.py` so outputs can be fed into `reporting_module`.
+
+## Run against your authorized local website
+
+VulnSight does not ship a vulnerable app. Start your own prepared local target first.
 
 ## Contents
 
