@@ -14,6 +14,9 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 
+from vulnsight.scoped_http import ScopePolicy, ScopedSession
+from vulnsight.scope import ScopeError
+
 from scanner.models import (
     Confidence,
     Finding,
@@ -94,17 +97,6 @@ PREFERRED_FIELDS = {
     "message",
 }
 
-
-def _validate_local_url(base_url: str) -> None:
-    parsed = urlparse(base_url)
-    host = (parsed.hostname or "").lower()
-    if (
-        parsed.scheme not in {"http", "https"}
-        or host not in {"127.0.0.1", "localhost", "::1"}
-        or parsed.username is not None
-        or parsed.password is not None
-    ):
-        raise ValueError("Testing is restricted to the local HTTP lab.")
 
 
 def _looks_like_auth_failure(status: int, text: str) -> bool:
@@ -406,9 +398,10 @@ def check_local_target(
     *,
     timeout: float = 5.0,
     max_requests: int = 40,
+    allow_private: bool = False,
+    allow_external: bool = False,
 ) -> ScanResult:
     """Check local target for SQLi using login probe + crawl-map points."""
-    _validate_local_url(base_url)
     result = ScanResult(module="sqli")
     base = base_url.rstrip("/")
     login_url = base + "/login"
@@ -416,7 +409,14 @@ def check_local_target(
     requests_sent = 0
 
     try:
-        with requests.Session() as client:
+        scoped = ScopedSession.for_target(
+            base_url, allow_private=allow_private, allow_external=allow_external
+        )
+    except ScopeError as exc:
+        raise ValueError(str(exc)) from exc
+
+    try:
+        with scoped as client:
             # 1) Legacy + flexible login bypass on /login
             try:
                 finding, outcome, sent = _login_bypass_probe(

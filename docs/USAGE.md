@@ -4,7 +4,7 @@
 
 Only scan systems you own or have explicit written permission to test. VulnSight defaults to loopback (`127.0.0.1` / `localhost` / `::1`). Crawler-discovered URLs are **not** authorization.
 
-VulnSight does not include a vulnerable target application. Start your own prepared local website first.
+VulnSight ships an optional training lab in `vulnerable-target-app/`. You may also bring your own authorized local website.
 
 ## Authorized project scan (recommended)
 
@@ -61,9 +61,14 @@ Useful `scan` flags:
 | `--crawl-map PATH` | Reuse a crawl map (skips recon) |
 | `--marker-only` | XSS marker-only mode |
 | `--browser-verify` | Optional Playwright confirmation |
-| `--allow-external` | Permit non-loopback targets (explicit) |
+| `--allow-external` | Permit non-loopback targets (explicit; see coverage note below) |
 | `--no-color` | Disable terminal colors |
 | `--max-pages` / `--max-requests` / `--timeout` | Budgets |
+
+### Coverage notes
+
+- **SQLi, command injection, and access control** are tuned to the training lab’s common routes and accounts (`/login`, `/ping`, `/profile/{id}`, `/admin`, alice/bob). Other authorized sites still get crawl-map-driven probes, but expect partial coverage unless you match those patterns.
+- **`--allow-external` / `allow_private_network`:** the crawler and XSS module honor project scope for non-loopback targets. SQLi, command injection, access control, and misconfig share the same `ScopedSession` as recon/XSS, so authorized `--allow-external` / `allow_private_network` scans can run those detectors too (still fail-closed on off-origin redirects).
 
 ## Module-only workflows
 

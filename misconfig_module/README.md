@@ -11,5 +11,5 @@ Checks authorized local targets for:
 
 ```python
 from misconfig.detector import check_local_target
-result = check_local_target("http://127.0.0.1:5000", crawl_map=crawl_map)
+result = check_local_target("http://127.0.0.1:5001", crawl_map=crawl_map)
 ```

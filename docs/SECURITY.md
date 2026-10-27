@@ -8,10 +8,11 @@ VulnSight is an **educational** scanner. Default operation is restricted to loop
 - Do **not** treat crawler output as permission to attack those URLs.
 - Prefer an authorized `--project` file that records who authorized the test.
 - Use `--allow-external` / `allow_private_network` only for explicitly authorized assessments.
+- Authorized non-loopback scans require `--allow-external` or `allow_private_network`. All detectors use `ScopedSession` and re-validate every redirect hop.
 
-## No bundled vulnerable target
+## Optional bundled training lab
 
-This repository does not include a deliberately vulnerable web application. Operators must supply their own authorized local target.
+This repository ships an optional deliberately vulnerable app in `vulnerable-target-app/` for local training. Bring-your-own authorized targets are also supported. Run the lab only on `127.0.0.1`.
 
 ## Sensitive data handling
 

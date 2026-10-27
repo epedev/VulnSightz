@@ -1,6 +1,6 @@
 # Expected findings (operator reference)
 
-VulnSight does not ship a vulnerable target. Expected findings depend on the prepared local website you authorize.
+Expected findings for the optional bundled lab live here; bring-your-own targets will differ. Authorize only sites you may test.
 
 When your lab plants the usual graduation scenarios, a full `vulnsight scan` may report classes such as:
 

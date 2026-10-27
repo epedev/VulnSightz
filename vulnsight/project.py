@@ -46,7 +46,7 @@ class ProjectConfig:
     timeout: float = 10.0
     max_requests: int = 200
     crawl_map_path: str | None = None
-    enable_stored_xss: bool = True
+    enable_stored_xss: bool = False
     enable_active_verify: bool = True
     enable_browser_verify: bool = False
     formats: list[str] = field(default_factory=lambda: ["json", "html", "md", "pdf"])
@@ -67,6 +67,7 @@ class ProjectConfig:
             timeout=self.timeout,
             max_requests=self.max_requests,
             allow_external=allow_external,
+            allow_private_network=self.allow_private_network or allow_external,
             allow_loopback=True,
             verbose=verbose,
             enable_stored_xss=self.enable_stored_xss,
@@ -254,7 +255,7 @@ def load_project_file(path: str | Path) -> ProjectConfig:
         timeout=float(crawl.get("timeout") or data.get("timeout") or 10.0),
         max_requests=int(data.get("max_requests") or 200),
         crawl_map_path=crawl_map,
-        enable_stored_xss=bool(data.get("enable_stored_xss", True)),
+        enable_stored_xss=bool(data.get("enable_stored_xss", False)),
         enable_active_verify=bool(data.get("enable_active_verify", True)),
         enable_browser_verify=bool(data.get("enable_browser_verify", False)),
         formats=[str(f) for f in formats],
@@ -288,7 +289,7 @@ def default_project_template(
         "formats": ["json", "html", "md", "pdf"],
         "crawl": {"max_pages": 40, "timeout": 10.0},
         "max_requests": 200,
-        "enable_stored_xss": True,
+        "enable_stored_xss": False,
         "enable_active_verify": True,
         "enable_browser_verify": False,
     }

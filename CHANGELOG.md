@@ -1,11 +1,19 @@
 # Changelog
 
+## 0.2.1 — Optional training lab restored in docs
+
+- Document `vulnerable-target-app/` as an optional bundled training lab (bring-your-own targets still supported)
+- Align SECURITY, USAGE, ARCHITECTURE, DEMO_RUNBOOK, VULNERABLE_TARGET, CONTRIBUTING, PROJECT, fixtures, XSS docs, interactive docs, and graduation documents with that truth
+- Add `scripts/check_docs_phrases.py` to fail CI on regressing "does not ship / no bundled target" wording
+
 ## 0.2.0 — Academic hardening features
 
-- Add `misconfig_module` (security headers, cookie flags, CSRF form candidates, open redirect)
+- Add `misconfig_module` (security headers, cookie flags, CSRF form candidates, open redirect, SSRF candidates, technology disclosure, verbose-error probes)
+- Map hygiene checks to OWASP Top 10:2025 (see `docs/OWASP_TOP10.md`)
 - Add `vulnsight compare` for secure-vs-vulnerable baseline demos
 - Add `docs/THREAT_MODEL.md` and assessment-quality section in HTML reports
 - Include false-positive / residual-risk guidance in report limitations
+- Re-introduce optional `vulnerable-target-app/` training lab (port 5001); reset via `python init_db.py` (no `/_lab/reset` route)
 
 ## 0.1.8 — Submission presentation
 
@@ -45,7 +53,7 @@
 - Clarify simulated command-injection findings (no OS shell claim; probable + lab_simulation evidence)
 - Mark partial scans incomplete when modules fail/skip; include access_control in known modules
 - Improve CLI scan summary (scope, confirmed vs suspected, actionable errors)
-- Allow `::1` loopback; add `POST /_lab/reset` for deterministic demos
+- Allow `::1` loopback; reset the training lab with `python init_db.py` for deterministic demos
 - Add negative-control integration tests, demo runbook, architecture diagram
 - Align `requirements.txt` with optional `lxml`
 

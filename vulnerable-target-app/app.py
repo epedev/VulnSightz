@@ -1,8 +1,8 @@
 """
 app.py
 
-INTENTIONALLY VULNERABLE target application — built for the webvuln-scanner
-camp project to have something real to scan. Every vulnerability below is
+INTENTIONALLY VULNERABLE target application — built for the VulnSight
+scanner to have something real to scan. Every vulnerability below is
 deliberate and documented in VULNERABILITIES.md with root cause,
 exploitation, impact, detection, and the fix. Do not deploy this anywhere
 reachable from the public internet. Run on localhost or an isolated lab
@@ -170,4 +170,4 @@ def sitemap():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    app.run(debug=False, host="127.0.0.1", port=5001)

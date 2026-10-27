@@ -25,9 +25,11 @@ class ScanConfig:
     timeout: float = 10.0
     max_requests: int = 200
     allow_external: bool = False
+    allow_private_network: bool = False
     allow_loopback: bool = True
+    request_delay_seconds: float = 0.0
     verbose: bool = False
-    enable_stored_xss: bool = True
+    enable_stored_xss: bool = False
     enable_active_verify: bool = True
     enable_metachar_probes: bool = True
     enable_browser_verify: bool = False

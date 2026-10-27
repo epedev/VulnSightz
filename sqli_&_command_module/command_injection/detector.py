@@ -13,6 +13,9 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 
+from vulnsight.scoped_http import ScopePolicy, ScopedSession
+from vulnsight.scope import ScopeError
+
 from scanner.models import (
     Confidence,
     Finding,
@@ -22,7 +25,9 @@ from scanner.models import (
     VerificationStatus,
 )
 
-MARKER = "REDOPS_CMD_TEST"
+# Token must NOT appear verbatim in the request; shell arithmetic proves interpretation.
+EXPECTED_TOKEN = "VULNSIGHT4011"  # printf %s%s VULNSIGHT $((1337*3))
+MARKER = EXPECTED_TOKEN  # backwards-compatible evidence key value
 PREFERRED_PARAMS = {
     "host",
     "ip",
@@ -37,17 +42,6 @@ PREFERRED_PARAMS = {
     "address",
 }
 
-
-def _validate_local_url(base_url: str) -> None:
-    parsed = urlparse(base_url)
-    host = (parsed.hostname or "").lower()
-    if (
-        parsed.scheme not in {"http", "https"}
-        or host not in {"127.0.0.1", "localhost", "::1"}
-        or parsed.username is not None
-        or parsed.password is not None
-    ):
-        raise ValueError("Testing is restricted to the local HTTP lab.")
 
 
 def _with_query_param(url: str, name: str, value: str) -> str:
@@ -79,22 +73,20 @@ def _build_finding(
             "marker_observed": True,
             "baseline_status": baseline_status,
             "test_status": test_status,
-            "lab_simulation": True,
-            "os_shell_executed": False,
             "note": (
-                "A unique marker injected through a command-like parameter appeared "
-                "in the response. Treat this as evidence of an unsafe concatenation "
-                "pattern, not as proof that the host executed operating-system commands."
+                "Marker observed in the response, consistent with shell execution "
+                "or reflection of the injected input. Confirm with a non-reflective "
+                "token before treating this as proven OS command execution."
             ),
         },
         detection_method="output_marker",
-        confidence=Confidence.HIGH.value,
+        confidence=Confidence.MEDIUM.value,
         severity=Severity.HIGH.value,
         verification_status=VerificationStatus.PROBABLE.value,
         http_status=test_status,
         description=(
-            "A unique marker injected through a command-like parameter appeared in "
-            "the response, indicating an unsafe sink pattern."
+            "Marker observed in the response after injecting a command-like payload; "
+            "consistent with shell execution but not yet proven by a non-reflective token."
         ),
         impact=(
             "In a real application that concatenates user input into a shell "
@@ -124,9 +116,9 @@ def _probe_endpoint(
     method = method.upper()
     fields = field_names or [parameter]
     payloads = payloads or (
-        ("127.0.0.1", f"127.0.0.1; printf {MARKER}"),
-        ("127.0.0.1", f"127.0.0.1|echo {MARKER}"),
-        ("x", f"x;printf {MARKER}"),
+        ("127.0.0.1", "127.0.0.1; printf %s%s VULNSIGHT $((1337*3))"),
+        ("127.0.0.1", "127.0.0.1; printf %s%s VULNSIGHT $((4000+11))"),
+        ("x", "x;printf %s%s VULNSIGHT $((1337*3))"),
     )
 
     last_outcome: TestOutcome | None = None
@@ -290,16 +282,24 @@ def check_local_target(
     *,
     timeout: float = 5.0,
     max_probes: int = 12,
+    allow_private: bool = False,
+    allow_external: bool = False,
 ) -> ScanResult:
     """Check for command-injection sink patterns on the local target."""
-    _validate_local_url(base_url)
     result = ScanResult(module="command_injection")
     base = base_url.rstrip("/")
     ping_url = base + "/ping"
     requests_sent = 0
 
     try:
-        with requests.Session() as client:
+        scoped = ScopedSession.for_target(
+            base_url, allow_private=allow_private, allow_external=allow_external
+        )
+    except ScopeError as exc:
+        raise ValueError(str(exc)) from exc
+
+    try:
+        with scoped as client:
             finding, outcome = _probe_endpoint(
                 client,
                 url=ping_url,
@@ -307,17 +307,18 @@ def check_local_target(
                 parameter="host",
                 field_names=["host"],
                 timeout=timeout,
-                payloads=(("127.0.0.1", f"127.0.0.1; printf {MARKER}"),),
+                payloads=(
+                    ("127.0.0.1", "127.0.0.1; printf %s%s VULNSIGHT $((1337*3))"),
+                ),
             )
             requests_sent += 2
             if finding:
-                # Preserve legacy wording for the training-lab /ping sink.
-                finding.title = "Command-injection sink pattern (lab simulation)"
-                finding.context = "Ping command output (simulated lab sink)"
+                # Keep finding text from _build_finding; only tweak title for /ping clarity.
+                finding.title = "Command-injection sink pattern on /ping"
+                finding.context = "Ping command output / unsafe concatenation sink"
                 finding.description = (
-                    "A unique marker injected through the host parameter appeared in the "
-                    "response. Against the VulnSight lab this demonstrates a simulated "
-                    "command-injection sink (no OS shell is executed)."
+                    "Marker observed in the /ping response after injecting a command-like "
+                    "payload; consistent with shell execution on the training lab."
                 )
                 result.findings.append(finding)
             elif outcome:

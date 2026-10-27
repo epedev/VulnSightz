@@ -4,8 +4,8 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-0f4c5c?style=flat-square)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-555555?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-pytest-0f4c5c?style=flat-square)](tests/)
-[![Version](https://img.shields.io/badge/version-0.2.0-1faa9a?style=flat-square)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-pytest%20%2B%20CI%20recipe-0f4c5c?style=flat-square)](docs/examples/github-actions-ci.yml)
+[![Version](https://img.shields.io/badge/version-0.2.1-1faa9a?style=flat-square)](CHANGELOG.md)
 [![Docs](https://img.shields.io/badge/docs-interactive-1faa9a?style=flat-square)](https://epedev.github.io/VulnSightz/)
 [![Repo](https://img.shields.io/badge/github-epedev%2FVulnSightz-0f4c5c?style=flat-square)](https://github.com/epedev/VulnSightz)
 
@@ -40,6 +40,7 @@ VulnSight is a Group 3 graduation project: an ethically constrained scanning pip
 - **Reporting:** HTML, Markdown, PDF, and JSON output.
 - **Comparison mode:** `vulnsight compare` contrasts a vulnerable build against a secure baseline.
 - **Lab-first defaults:** loopback targets only, with explicit opt-in for anything else.
+- **Lab-tuned detectors:** SQLi, command injection, and access control favor common training-lab routes (`/login`, `/ping`, `/profile/{id}`, `/admin`) and lab accounts; other sites get crawl-map-driven partial coverage.
 - **Interactive documentation:** `vulnsight docs`.
 
 ## Pipeline
@@ -55,7 +56,7 @@ Authorize → Recon → Detect (XSS / SQLi / Cmd / Access / Hygiene) → Report
 | XSS | `xss_module/` | Reflected and stored XSS |
 | Injection | `sqli_&_command_module/` | SQL injection and command injection |
 | Access control | `access_control_module/` | IDOR and broken access control |
-| Security hygiene | `misconfig_module/` | Headers, cookies, CSRF, open redirect, disclosure |
+| Security hygiene | `misconfig_module/` | Headers, cookies, CSRF, open redirect, SSRF signals, disclosure, verbose errors |
 | Reporting | `reporting_module/` | Normalization, CVSS, OWASP mapping, HTML / MD / PDF / JSON |
 | Test lab (optional) | `vulnerable-target-app/` | Deliberately vulnerable Flask app to scan |
 
@@ -79,11 +80,11 @@ vulnsight doctor
 ## Quick start
 
 ```bash
-# 1. Start a local website under test on http://127.0.0.1:5000
+# 1. Start a local website under test on http://127.0.0.1:5001
 #    (the bundled lab works: see the next section)
 
 # 2. Create an authorization project file
-vulnsight init-project -o myproject.json --target http://127.0.0.1:5000
+vulnsight init-project -o myproject.json --target http://127.0.0.1:5001
 #    then set authorization.authorized_by in myproject.json
 
 # 3. Run the full pipeline
@@ -129,13 +130,13 @@ python3 -m venv venv
 source venv/bin/activate
 python -m pip install -r requirements.txt
 python init_db.py        # creates and seeds target.db
-python app.py            # serves http://127.0.0.1:5000
+python app.py            # serves http://127.0.0.1:5001
 ```
 
 Then scan it from the repository root:
 
 ```bash
-vulnsight init-project -o myproject.json --target http://127.0.0.1:5000
+vulnsight init-project -o myproject.json --target http://127.0.0.1:5001
 # set authorization.authorized_by in myproject.json
 vulnsight scan --project myproject.json
 ```
@@ -217,13 +218,13 @@ See [SECURITY.md](SECURITY.md) and [docs/SECURITY.md](docs/SECURITY.md).
 
 Group 3:
 
-| Student name | Student ID |
-|--------------|------------|
-| Kenean Amare Eshetu | CTC-4837-26 |
-| Kenneti Hailu Dange | CTC-535-26 |
-| Kidsit Ephrem | CTC-6744-26 |
-| Alazar Elias Digafe | CTC-631-26 |
-| Firaol Mustefa Gossa | CTC-4301-26 |
+| Student name |
+|--------------|
+| Kenean Amare Eshetu |
+| Kenneti Hailu Dange |
+| Kidsit Ephrem |
+| Alazar Elias Digafe |
+| Firaol Mustefa Gossa |
 
 See also [AUTHORS.md](AUTHORS.md).
 

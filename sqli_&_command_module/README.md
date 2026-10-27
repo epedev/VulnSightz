@@ -41,14 +41,14 @@ PYTHONPATH="sqli_&_command_module:xss_module" python -m pytest -q 'sqli_&_comman
 
 ## Local checks
 
-Start the intentionally vulnerable Flask training app on `127.0.0.1:5000`, then from the repository root:
+Start the intentionally vulnerable Flask training app on `127.0.0.1:5001`, then from the repository root:
 
 ```bash
 PYTHONPATH="sqli_&_command_module:xss_module" python -c \
-'from sqli.detector import check_local_target; print(check_local_target("http://127.0.0.1:5000").to_dict())'
+'from sqli.detector import check_local_target; print(check_local_target("http://127.0.0.1:5001").to_dict())'
 
 PYTHONPATH="sqli_&_command_module:xss_module" python -c \
-'from command_injection.detector import check_local_target; print(check_local_target("http://127.0.0.1:5000").to_dict())'
+'from command_injection.detector import check_local_target; print(check_local_target("http://127.0.0.1:5001").to_dict())'
 ```
 
 Save JSON output and pass it to the reporting module with `--sqli` / `--input` as appropriate.

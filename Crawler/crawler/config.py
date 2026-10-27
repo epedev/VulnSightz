@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-DEFAULT_UA = "WebVulnScanner/0.1 (+authorized-lab; crawler)"
+DEFAULT_UA = "VulnSight/0.2 (+authorized-assessment; crawler)"
 
 
 @dataclass
@@ -19,6 +19,7 @@ class CrawlerConfig:
     connect_timeout: float = 5.0
     max_response_bytes: int = 1_000_000
     user_agent: str = DEFAULT_UA
+    request_delay_seconds: float = 0.0
     cookies: dict[str, str] = field(default_factory=dict)
     headers: dict[str, str] = field(default_factory=dict)
     same_origin_only: bool = True

@@ -77,7 +77,7 @@ python -m pip install -r requirements.txt
 
 ## Run against your authorized local website
 
-VulnSight does not ship a vulnerable app. Start your own prepared local target first.
+Use the optional bundled lab in `vulnerable-target-app/` or start your own prepared local target first.
 
 ```bash
 # Terminal 1 — your authorized local website on http://127.0.0.1:5001

@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+from xml.sax.saxutils import escape as _xml_escape
 
 from reporting.html_report import render_html
 from reporting.schema import ReportResult
@@ -58,6 +59,17 @@ def _write_pdf_weasyprint_cli(html: str, path: Path) -> None:
             raise RuntimeError(f"weasyprint CLI failed: {detail[:400]}")
 
 
+
+def _para(text: object, style) -> "Paragraph":
+    """Build a ReportLab Paragraph from untrusted text (always XML-escaped)."""
+    from reportlab.platypus import Paragraph
+
+    raw = "" if text is None else str(text)
+    # Preserve intentional line breaks we insert as <br/> after escaping.
+    safe = _xml_escape(raw).replace("\n", "<br/>")
+    return Paragraph(safe, style)
+
+
 def _write_pdf_reportlab(result: ReportResult, path: Path) -> None:
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
@@ -100,47 +112,50 @@ def _write_pdf_reportlab(result: ReportResult, path: Path) -> None:
         bottomMargin=14 * mm,
     )
     story = []
-    story.append(Paragraph(meta.get("report_title", "VulnSight Report"), title_style))
+    story.append(_para(meta.get("report_title", "VulnSight Report"), title_style))
     story.append(
-        Paragraph(
-            f"Target: {meta.get('target', '')}<br/>"
-            f"Generated (UTC): {meta.get('generated_at', '')}<br/>"
+        _para(
+            f"Target: {meta.get('target', '')}\n"
+            f"Generated (UTC): {meta.get('generated_at', '')}\n"
             f"Scanner: {meta.get('scanner_version', '')} · "
             f"Scan ID: {meta.get('scan_id', '')}",
             body,
         )
     )
     story.append(Spacer(1, 8))
-    story.append(Paragraph("Executive summary", h2))
+    story.append(_para("Executive summary", h2))
     by_sev = summary.get("by_severity") or {}
     sev_bits = ", ".join(f"{k}={v}" for k, v in by_sev.items()) or "none"
     by_mod = summary.get("by_source_module") or {}
     mod_bits = ", ".join(f"{k}={v}" for k, v in by_mod.items()) or "none"
+    # Safe static markup around escaped dynamic fragments
+    from reportlab.platypus import Paragraph as _P
     story.append(
-        Paragraph(
-            f"Unique findings: <b>{summary.get('total_unique_findings', 0)}</b> · "
-            f"Highest CVSS: <b>{summary.get('highest_cvss_score') if summary.get('highest_cvss_score') is not None else '—'}</b><br/>"
-            f"By severity: {sev_bits}<br/>"
-            f"By module: {mod_bits}",
+        _P(
+            f"Unique findings: <b>{_xml_escape(str(summary.get('total_unique_findings', 0)))}</b> · "
+            f"Highest CVSS: <b>{_xml_escape(str(summary.get('highest_cvss_score') if summary.get('highest_cvss_score') is not None else '—'))}</b><br/>"
+            f"By severity: {_xml_escape(sev_bits)}<br/>"
+            f"By module: {_xml_escape(mod_bits)}",
             body,
         )
     )
     owasp = summary.get("owasp_top10") or {}
     if owasp:
-        story.append(Paragraph("OWASP Top 10 coverage", h2))
+        story.append(_para("OWASP Top 10 coverage", h2))
+        from reportlab.platypus import Paragraph as _P
         story.append(
-            Paragraph(
-                f"{owasp.get('standard', 'OWASP Top 10')} · "
+            _P(
+                f"{_xml_escape(str(owasp.get('standard', 'OWASP Top 10')))} · "
                 f"categories with findings: "
-                f"<b>{owasp.get('categories_with_findings', 0)}</b> / "
-                f"{owasp.get('categories_tracked', 10)}",
+                f"<b>{_xml_escape(str(owasp.get('categories_with_findings', 0)))}</b> / "
+                f"{_xml_escape(str(owasp.get('categories_tracked', 10)))}",
                 body,
             )
         )
-    story.append(Paragraph("Findings", h2))
+    story.append(_para("Findings", h2))
 
     if not result.findings:
-        story.append(Paragraph("No findings to display.", body))
+        story.append(_para("No findings to display.", body))
     else:
         data = [["Title", "Sev", "CVSS", "Status", "Module"]]
         for f in result.findings[:80]:
@@ -151,7 +166,7 @@ def _write_pdf_reportlab(result: ReportResult, path: Path) -> None:
             )
             data.append(
                 [
-                    Paragraph((f.title or "")[:90], body),
+                    _para((f.title or "")[:90], body),
                     f.severity,
                     cvss,
                     f.verification_status,
@@ -176,13 +191,14 @@ def _write_pdf_reportlab(result: ReportResult, path: Path) -> None:
 
         for idx, f in enumerate(result.findings[:40], start=1):
             story.append(Spacer(1, 6))
-            story.append(Paragraph(f"{idx}. {f.title}", h2))
+            story.append(_para(f"{idx}. {f.title}", h2))
+            from reportlab.platypus import Paragraph as _P
             story.append(
-                Paragraph(
-                    f"<b>Endpoint:</b> {f.method} {f.url}<br/>"
-                    f"<b>Severity:</b> {f.severity} · <b>Verification:</b> {f.verification_status}<br/>"
-                    f"<b>Description:</b> {(f.description or '')[:500]}<br/>"
-                    f"<b>Remediation:</b> {(f.remediation or '')[:500]}",
+                _P(
+                    f"<b>Endpoint:</b> {_xml_escape(str(f.method))} {_xml_escape(str(f.url))}<br/>"
+                    f"<b>Severity:</b> {_xml_escape(str(f.severity))} · <b>Verification:</b> {_xml_escape(str(f.verification_status))}<br/>"
+                    f"<b>Description:</b> {_xml_escape((f.description or '')[:500])}<br/>"
+                    f"<b>Remediation:</b> {_xml_escape((f.remediation or '')[:500])}",
                     body,
                 )
             )

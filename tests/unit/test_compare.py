@@ -12,7 +12,7 @@ def test_compare_detects_new_findings(tmp_path):
             {
                 "title": "Missing CSP",
                 "vulnerability_type": "Security Misconfiguration",
-                "url": "http://127.0.0.1:5000/",
+                "url": "http://127.0.0.1:5001/",
                 "parameter": "",
                 "severity": "medium",
                 "module": "misconfig",

@@ -1,8 +1,8 @@
 # Graduation demo runbook
 
-Use this checklist for a live presentation or screen recording. Do **not** claim a video exists unless you have recorded one.
+Use this checklist for a live presentation or screen recording. A recorded demo is available at `Assets/Video/vulnsight_test.mp4` (also linked from the README).
 
-VulnSight does not bundle a vulnerable app — start your team's prepared local website before the demo.
+Start the optional bundled lab (`vulnerable-target-app/`) or your team's prepared local website before the demo.
 
 ## 0. Environment (once)
 

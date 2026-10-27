@@ -93,3 +93,37 @@ def test_default_formats_include_pdf(tmp_path):
     )
     assert "pdf" in result.outputs
     assert Path(result.outputs["pdf"]).exists()
+
+
+def test_pdf_escapes_hostile_finding_titles(tmp_path):
+    """Target-controlled titles must not break ReportLab markup parsing."""
+    assert pdf_backend_available()
+    hostile = [
+        {
+            "title": 'SSRF candidate via \'<img src="x">\' & <b>bold',
+            "vulnerability_type": "Server-Side Request Forgery",
+            "type": "ssrf",
+            "url": "http://127.0.0.1:5001/fetch?url=1",
+            "method": "GET",
+            "parameter": '<img src="x">',
+            "severity": "medium",
+            "confidence": "low",
+            "verification_status": "candidate",
+            "description": "Hostile <b>markup</b> & ampersands " + ("A" * 2000),
+            "impact": "n/a",
+            "remediation": "Validate URLs.",
+            "cwe": "CWE-918",
+            "module": "misconfig",
+            "evidence": {"param": '<img src="x">'},
+        }
+    ]
+    result = generate_report(
+        output_dir=tmp_path,
+        findings_objects=hostile,
+        formats=["pdf"],
+        pdf=True,
+        target="http://127.0.0.1:5001",
+        authorized_origin="http://127.0.0.1:5001",
+    )
+    pdf = Path(result.outputs["pdf"])
+    assert pdf.exists() and pdf.stat().st_size > 100
