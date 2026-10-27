@@ -488,10 +488,7 @@ def _check_ssrf(
             or marker_host in body
             or (test.status_code >= 500 and baseline.status_code < 500)
         )
-        if not signal:
-            # Still raise a low-confidence candidate when SSRF-like param accepts absolute URL without erroring immediately as validation failure
-            if test.status_code == 200 and len(body) != len(baseline.text or ""):
-                signal = True
+        # Do not treat body-length drift alone as SSRF evidence (dynamic pages vary).
         if not signal:
             continue
         findings.append(
