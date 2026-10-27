@@ -10,7 +10,7 @@
 
 | Student name | Student ID |
 |--------------|------------|
-| Kenean Amare Eshet | CTC-4837-26 |
+| Kenean Amare Eshetu | CTC-4837-26 |
 | Kenneti Hailu Dange | CTC-535-26 |
 | Kidsit Ephrem | CTC-6744-26 |
 | Alazar Elias Digafe | CTC-631-26 |

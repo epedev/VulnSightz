@@ -5,7 +5,7 @@ INSA Summer Camp · Graduation Project
 
 | Group Member | ID |
 |---|---|
-| Kenean Amare Eshet | CTC-4837-26 |
+| Kenean Amare Eshetu | CTC-4837-26 |
 | Kenneti Hailu Dange | CTC-535-26 |
 | Kidsit Ephrem Zemede | CTC-6744-26 |
 | Firaol Mustefa Gossa | CTC-4301-26 |
