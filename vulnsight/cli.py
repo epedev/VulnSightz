@@ -94,11 +94,18 @@ def _cmd_doctor(args: argparse.Namespace) -> int:
     except Exception as exc:  # noqa: BLE001
         ui.status_info(f"browser verify check skipped ({exc})")
 
+    lab_dir = Path(__file__).resolve().parent.parent / "vulnerable-target-app"
+    if lab_dir.is_dir():
+        ui.status_ok("optional training lab present (vulnerable-target-app/)")
+        ui.status_info(
+            "Lab default: http://127.0.0.1:5001 — or bring your own authorized target"
+        )
+    else:
+        ui.status_info(
+            "No training lab directory found — point vulnsight at your authorized local website"
+        )
     ui.status_info(
-        "No bundled vulnerable app — point vulnsight at your authorized local website"
-    )
-    ui.status_info(
-        "Create a project file: vulnsight init-project -o myproject.json --target http://127.0.0.1:PORT"
+        "Create a project file: vulnsight init-project -o myproject.json --target http://127.0.0.1:5001"
     )
 
     ui.render_doctor_footer(ok)
