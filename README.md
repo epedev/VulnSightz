@@ -56,7 +56,7 @@ Authorize → Recon → Detect (XSS / SQLi / Cmd / Access / Hygiene) → Report
 | XSS | `xss_module/` | Reflected and stored XSS |
 | Injection | `sqli_&_command_module/` | SQL injection and command injection |
 | Access control | `access_control_module/` | IDOR and broken access control |
-| Security hygiene | `misconfig_module/` | Headers, cookies, CSRF, open redirect, disclosure |
+| Security hygiene | `misconfig_module/` | Headers, cookies, CSRF, open redirect, SSRF signals, disclosure, verbose errors |
 | Reporting | `reporting_module/` | Normalization, CVSS, OWASP mapping, HTML / MD / PDF / JSON |
 | Test lab (optional) | `vulnerable-target-app/` | Deliberately vulnerable Flask app to scan |
 
