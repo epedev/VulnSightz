@@ -14,7 +14,7 @@ class TestIDOR(unittest.TestCase):
         session.get.return_value = Mock(status_code=200, text="x" * 50)
 
         result = check_idor(
-            "http://127.0.0.1:5000", session, own_user_id=1, probe_ids=[1, 2, 3]
+            "http://127.0.0.1:5001", session, own_user_id=1, probe_ids=[1, 2, 3]
         )
 
         # own_user_id (1) is skipped; 2 and 3 both return 200 -> two findings
@@ -27,7 +27,7 @@ class TestIDOR(unittest.TestCase):
         session.get.return_value = Mock(status_code=403, text="Forbidden")
 
         result = check_idor(
-            "http://127.0.0.1:5000", session, own_user_id=1, probe_ids=[1, 2]
+            "http://127.0.0.1:5001", session, own_user_id=1, probe_ids=[1, 2]
         )
 
         self.assertEqual(result.findings, [])
@@ -38,7 +38,7 @@ class TestIDOR(unittest.TestCase):
         session.get.return_value = Mock(status_code=200, text="x")
 
         result = check_idor(
-            "http://127.0.0.1:5000", session, own_user_id=1, probe_ids=[1]
+            "http://127.0.0.1:5001", session, own_user_id=1, probe_ids=[1]
         )
 
         session.get.assert_not_called()
@@ -55,7 +55,7 @@ class TestBrokenAccessControl(unittest.TestCase):
         session = Mock()
         session.get.return_value = Mock(status_code=200, text="x" * 100)
 
-        result = check_broken_access_control("http://127.0.0.1:5000", session)
+        result = check_broken_access_control("http://127.0.0.1:5001", session)
 
         self.assertEqual(len(result.findings), 1)
         self.assertEqual(result.findings[0].cwe, "CWE-284")
@@ -65,7 +65,7 @@ class TestBrokenAccessControl(unittest.TestCase):
         session = Mock()
         session.get.return_value = Mock(status_code=403, text="Forbidden")
 
-        result = check_broken_access_control("http://127.0.0.1:5000", session)
+        result = check_broken_access_control("http://127.0.0.1:5001", session)
 
         self.assertEqual(result.findings, [])
         self.assertEqual(len(result.outcomes), 1)
@@ -98,7 +98,7 @@ class TestCheckLocalTarget(unittest.TestCase):
         mock_idor.return_value = idor_result
         mock_bac.return_value = bac_result
 
-        result = check_local_target("http://127.0.0.1:5000")
+        result = check_local_target("http://127.0.0.1:5001")
 
         self.assertEqual(len(result.findings), 2)
         # authenticated probes + logins (+ unauth mocked as 0)

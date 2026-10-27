@@ -11,14 +11,14 @@ class TestMisconfig(unittest.TestCase):
         client = Mock()
         mock_session.return_value.__enter__.return_value = client
         resp = Mock()
-        resp.url = "http://127.0.0.1:5000/"
+        resp.url = "http://127.0.0.1:5001/"
         resp.headers = {"Content-Type": "text/html"}
         resp.text = "<html></html>"
         resp.status_code = 200
         resp.raw.headers.getlist = Mock(return_value=[])
         client.get.return_value = resp
 
-        result = check_local_target("http://127.0.0.1:5000")
+        result = check_local_target("http://127.0.0.1:5001")
         titles = [f.title for f in result.findings]
         self.assertTrue(any("Content-Security-Policy" in t for t in titles))
         self.assertTrue(any("X-Frame-Options" in t for t in titles))
@@ -28,7 +28,7 @@ class TestMisconfig(unittest.TestCase):
         client = Mock()
         mock_session.return_value.__enter__.return_value = client
         resp = Mock()
-        resp.url = "http://127.0.0.1:5000/"
+        resp.url = "http://127.0.0.1:5001/"
         resp.headers = {
             "Content-Type": "text/html",
             "Content-Security-Policy": "default-src 'self'",
@@ -44,7 +44,7 @@ class TestMisconfig(unittest.TestCase):
         crawl = {
             "forms": [
                 {
-                    "action": "http://127.0.0.1:5000/transfer",
+                    "action": "http://127.0.0.1:5001/transfer",
                     "method": "POST",
                     "fields": [{"name": "amount", "input_type": "text"}],
                 }
@@ -52,7 +52,7 @@ class TestMisconfig(unittest.TestCase):
             "pages": [],
             "endpoints": [],
         }
-        result = check_local_target("http://127.0.0.1:5000", crawl_map=crawl)
+        result = check_local_target("http://127.0.0.1:5001", crawl_map=crawl)
         self.assertTrue(any("CSRF" in f.title for f in result.findings))
 
     @patch("misconfig.detector.requests.Session")
@@ -60,7 +60,7 @@ class TestMisconfig(unittest.TestCase):
         client = Mock()
         mock_session.return_value.__enter__.return_value = client
         home = Mock()
-        home.url = "http://127.0.0.1:5000/"
+        home.url = "http://127.0.0.1:5001/"
         home.headers = {
             "Content-Type": "text/html",
             "Content-Security-Policy": "default-src 'self'",
@@ -86,14 +86,14 @@ class TestMisconfig(unittest.TestCase):
             "forms": [],
             "pages": [
                 {
-                    "url": "http://127.0.0.1:5000/",
+                    "url": "http://127.0.0.1:5001/",
                     "params": [],
-                    "links": ["http://127.0.0.1:5000/go?next=/"],
+                    "links": ["http://127.0.0.1:5001/go?next=/"],
                 }
             ],
             "endpoints": [],
         }
-        result = check_local_target("http://127.0.0.1:5000", crawl_map=crawl)
+        result = check_local_target("http://127.0.0.1:5001", crawl_map=crawl)
         self.assertTrue(any("Open redirect" in f.title for f in result.findings))
 
     @patch("misconfig.detector.requests.Session")
@@ -101,7 +101,7 @@ class TestMisconfig(unittest.TestCase):
         client = Mock()
         mock_session.return_value.__enter__.return_value = client
         resp = Mock()
-        resp.url = "http://127.0.0.1:5000/"
+        resp.url = "http://127.0.0.1:5001/"
         resp.headers = {
             "Content-Type": "text/html",
             "Content-Security-Policy": "default-src 'self'",
@@ -118,7 +118,7 @@ class TestMisconfig(unittest.TestCase):
         crawl = {
             "forms": [
                 {
-                    "action": "http://127.0.0.1:5000/login",
+                    "action": "http://127.0.0.1:5001/login",
                     "method": "POST",
                     "fields": [
                         {"name": "username", "input_type": "text"},
@@ -129,7 +129,7 @@ class TestMisconfig(unittest.TestCase):
             "pages": [],
             "endpoints": [],
         }
-        result = check_local_target("http://127.0.0.1:5000", crawl_map=crawl)
+        result = check_local_target("http://127.0.0.1:5001", crawl_map=crawl)
         titles = [f.title for f in result.findings]
         self.assertTrue(any("Technology disclosure" in t for t in titles))
         self.assertTrue(any("cleartext HTTP" in t for t in titles))
@@ -142,7 +142,7 @@ class TestMisconfig(unittest.TestCase):
         client = Mock()
         mock_session.return_value.__enter__.return_value = client
         home = Mock()
-        home.url = "http://127.0.0.1:5000/"
+        home.url = "http://127.0.0.1:5001/"
         home.headers = {
             "Content-Type": "text/html",
             "Content-Security-Policy": "default-src 'self'",
@@ -167,14 +167,14 @@ class TestMisconfig(unittest.TestCase):
             "forms": [],
             "pages": [
                 {
-                    "url": "http://127.0.0.1:5000/fetch",
+                    "url": "http://127.0.0.1:5001/fetch",
                     "params": [{"name": "target_url"}],
                     "links": [],
                 }
             ],
             "endpoints": [],
         }
-        result = check_local_target("http://127.0.0.1:5000", crawl_map=crawl, max_requests=10)
+        result = check_local_target("http://127.0.0.1:5001", crawl_map=crawl, max_requests=10)
         self.assertTrue(any("SSRF" in f.title for f in result.findings))
         ssrf = next(f for f in result.findings if "SSRF" in f.title)
         self.assertTrue(ssrf.owasp.startswith("A01:2025"))

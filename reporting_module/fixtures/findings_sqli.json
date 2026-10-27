@@ -5,7 +5,7 @@
       "id": "sqli-1",
       "vulnerability_type": "SQL Injection",
       "title": "Possible error-based SQL injection",
-      "url": "http://127.0.0.1:5000/login",
+      "url": "http://127.0.0.1:5001/login",
       "method": "POST",
       "parameter": "username",
       "input_type": "form",

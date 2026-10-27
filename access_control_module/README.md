@@ -32,7 +32,7 @@ python -m pip install -r access_control_module/requirements.txt
 ```python
 from access_control.detector import check_local_target
 
-result = check_local_target("http://127.0.0.1:5000")
+result = check_local_target("http://127.0.0.1:5001")
 for finding in result.findings:
     print(finding.severity, finding.title)
 ```

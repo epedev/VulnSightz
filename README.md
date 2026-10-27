@@ -79,11 +79,11 @@ vulnsight doctor
 ## Quick start
 
 ```bash
-# 1. Start a local website under test on http://127.0.0.1:5000
+# 1. Start a local website under test on http://127.0.0.1:5001
 #    (the bundled lab works: see the next section)
 
 # 2. Create an authorization project file
-vulnsight init-project -o myproject.json --target http://127.0.0.1:5000
+vulnsight init-project -o myproject.json --target http://127.0.0.1:5001
 #    then set authorization.authorized_by in myproject.json
 
 # 3. Run the full pipeline
@@ -129,13 +129,13 @@ python3 -m venv venv
 source venv/bin/activate
 python -m pip install -r requirements.txt
 python init_db.py        # creates and seeds target.db
-python app.py            # serves http://127.0.0.1:5000
+python app.py            # serves http://127.0.0.1:5001
 ```
 
 Then scan it from the repository root:
 
 ```bash
-vulnsight init-project -o myproject.json --target http://127.0.0.1:5000
+vulnsight init-project -o myproject.json --target http://127.0.0.1:5001
 # set authorization.authorized_by in myproject.json
 vulnsight scan --project myproject.json
 ```

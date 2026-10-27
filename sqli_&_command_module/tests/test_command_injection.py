@@ -14,7 +14,7 @@ class TestCommandInjection(unittest.TestCase):
         test = Mock(status_code=200, text="ping output REDOPS_CMD_TEST")
         client.post.side_effect = [baseline, test]
 
-        result = check_local_target("http://127.0.0.1:5000")
+        result = check_local_target("http://127.0.0.1:5001")
 
         self.assertEqual(len(result.findings), 1)
         finding = result.findings[0]
@@ -38,7 +38,7 @@ class TestCommandInjection(unittest.TestCase):
         test = Mock(status_code=200, text="normal ping output")
         client.post.side_effect = [baseline, test]
 
-        result = check_local_target("http://127.0.0.1:5000")
+        result = check_local_target("http://127.0.0.1:5001")
 
         self.assertEqual(result.findings, [])
         self.assertEqual(len(result.outcomes), 1)
