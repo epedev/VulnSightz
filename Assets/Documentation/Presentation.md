@@ -5,11 +5,11 @@ INSA Summer Camp · Graduation Project
 
 | Group Member | ID |
 |---|---|
-| Kenean Amare Eshetu | CTC-4837-26 |
-| Kenneti Hailu Dange | CTC-535-26 |
-| Kidsit Ephrem Zemede | CTC-6744-26 |
-| Firaol Mustefa Gossa | CTC-4301-26 |
-| Alazar Elias Digafe | CTC-631-26 |
+| Kenean Amare Eshetu |
+| Kenneti Hailu Dange |
+| Kidsit Ephrem Zemede |
+| Firaol Mustefa Gossa |
+| Alazar Elias Digafe |
 
 ---
 
@@ -64,7 +64,7 @@ Design a modular, command-line tool that supports controlled security testing an
 ## Detection Modules: Five bounded checks
 
 | Module | What it does |
-|---|---|
+|--------------|
 | **XSS** | Marker reflection, context analysis, optional browser check |
 | **SQL injection** | Auth-bypass behavior and database error signatures |
 | **Command injection** | Controlled output marker in the response |

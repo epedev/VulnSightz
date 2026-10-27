@@ -218,13 +218,13 @@ See [SECURITY.md](SECURITY.md) and [docs/SECURITY.md](docs/SECURITY.md).
 
 Group 3:
 
-| Student name | Student ID |
-|--------------|------------|
-| Kenean Amare Eshetu | CTC-4837-26 |
-| Kenneti Hailu Dange | CTC-535-26 |
-| Kidsit Ephrem | CTC-6744-26 |
-| Alazar Elias Digafe | CTC-631-26 |
-| Firaol Mustefa Gossa | CTC-4301-26 |
+| Student name |
+|--------------|
+| Kenean Amare Eshetu |
+| Kenneti Hailu Dange |
+| Kidsit Ephrem |
+| Alazar Elias Digafe |
+| Firaol Mustefa Gossa |
 
 See also [AUTHORS.md](AUTHORS.md).
 
