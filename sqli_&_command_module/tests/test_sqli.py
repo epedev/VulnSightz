@@ -5,10 +5,10 @@ from sqli.detector import check_local_target, inspect_response
 
 
 class TestSQLi(unittest.TestCase):
-    @patch("sqli.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_detects_expected_login_bypass_behavior(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
 
         baseline = Mock(status_code=200, text="Invalid credentials")
         test = Mock(status_code=302, headers={"Location": "/"})
@@ -49,10 +49,10 @@ class TestSQLi(unittest.TestCase):
 
 
 
-    @patch("sqli.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_crawl_map_error_based(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
 
         baseline = Mock(status_code=200, text="Invalid credentials", headers={})
         bypass = Mock(status_code=200, text="still invalid", headers={})

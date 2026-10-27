@@ -13,6 +13,9 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 
+from vulnsight.scoped_http import ScopePolicy, ScopedSession
+from vulnsight.scope import ScopeError
+
 from scanner.models import (
     Confidence,
     Finding,
@@ -37,17 +40,6 @@ PREFERRED_PARAMS = {
     "address",
 }
 
-
-def _validate_local_url(base_url: str) -> None:
-    parsed = urlparse(base_url)
-    host = (parsed.hostname or "").lower()
-    if (
-        parsed.scheme not in {"http", "https"}
-        or host not in {"127.0.0.1", "localhost", "::1"}
-        or parsed.username is not None
-        or parsed.password is not None
-    ):
-        raise ValueError("Testing is restricted to the local HTTP lab.")
 
 
 def _with_query_param(url: str, name: str, value: str) -> str:
@@ -288,16 +280,24 @@ def check_local_target(
     *,
     timeout: float = 5.0,
     max_probes: int = 12,
+    allow_private: bool = False,
+    allow_external: bool = False,
 ) -> ScanResult:
     """Check for command-injection sink patterns on the local target."""
-    _validate_local_url(base_url)
     result = ScanResult(module="command_injection")
     base = base_url.rstrip("/")
     ping_url = base + "/ping"
     requests_sent = 0
 
     try:
-        with requests.Session() as client:
+        scoped = ScopedSession.for_target(
+            base_url, allow_private=allow_private, allow_external=allow_external
+        )
+    except ScopeError as exc:
+        raise ValueError(str(exc)) from exc
+
+    try:
+        with scoped as client:
             finding, outcome = _probe_endpoint(
                 client,
                 url=ping_url,
@@ -309,13 +309,12 @@ def check_local_target(
             )
             requests_sent += 2
             if finding:
-                # Preserve legacy wording for the training-lab /ping sink.
-                finding.title = "Command-injection sink pattern (lab simulation)"
-                finding.context = "Ping command output (simulated lab sink)"
+                # Keep finding text from _build_finding; only tweak title for /ping clarity.
+                finding.title = "Command-injection sink pattern on /ping"
+                finding.context = "Ping command output / unsafe concatenation sink"
                 finding.description = (
-                    "A unique marker injected through the host parameter appeared in the "
-                    "response. Against the VulnSight lab this demonstrates a simulated "
-                    "command-injection sink (no OS shell is executed)."
+                    "Marker observed in the /ping response after injecting a command-like "
+                    "payload; consistent with shell execution on the training lab."
                 )
                 result.findings.append(finding)
             elif outcome:

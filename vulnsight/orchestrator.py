@@ -244,6 +244,8 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
                 crawl_map=crawl_map,
                 timeout=cfg.timeout,
                 max_requests=min(40, cfg.max_requests),
+                allow_private=cfg.allow_private_network,
+                allow_external=cfg.allow_external,
             )
             findings = _finding_dicts(result)
             all_findings.extend(findings)
@@ -284,6 +286,8 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
                 crawl_map=crawl_map,
                 timeout=cfg.timeout,
                 max_probes=12,
+                allow_private=cfg.allow_private_network,
+                allow_external=cfg.allow_external,
             )
             findings = _finding_dicts(result)
             all_findings.extend(findings)
@@ -324,7 +328,12 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
         try:
             from access_control.detector import check_local_target as ac_check
 
-            result = ac_check(target, crawl_map=crawl_map)
+            result = ac_check(
+                target,
+                crawl_map=crawl_map,
+                allow_private=cfg.allow_private_network,
+                allow_external=cfg.allow_external,
+            )
             findings = _finding_dicts(result)
             all_findings.extend(findings)
             _write_json(out / "findings_access_control.json", result.to_dict())
@@ -370,6 +379,8 @@ def run_scan(cfg: ScanConfig) -> OrchestratorResult:
                 crawl_map=crawl_map,
                 timeout=cfg.timeout,
                 max_requests=min(20, cfg.max_requests),
+                allow_private=cfg.allow_private_network,
+                allow_external=cfg.allow_external,
             )
             findings = _finding_dicts(result)
             all_findings.extend(findings)

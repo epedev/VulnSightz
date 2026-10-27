@@ -68,7 +68,7 @@ Useful `scan` flags:
 ### Coverage notes
 
 - **SQLi, command injection, and access control** are tuned to the training lab’s common routes and accounts (`/login`, `/ping`, `/profile/{id}`, `/admin`, alice/bob). Other authorized sites still get crawl-map-driven probes, but expect partial coverage unless you match those patterns.
-- **`--allow-external` / `allow_private_network`:** the crawler and XSS module honor project scope for non-loopback targets. Until a shared scoped HTTP session is used everywhere, SQLi, command injection, access control, and misconfig still refuse non-loopback bases — so an authorized external scan currently runs **recon and XSS only** for those modules’ contribution.
+- **`--allow-external` / `allow_private_network`:** the crawler and XSS module honor project scope for non-loopback targets. SQLi, command injection, access control, and misconfig share the same `ScopedSession` as recon/XSS, so authorized `--allow-external` / `allow_private_network` scans can run those detectors too (still fail-closed on off-origin redirects).
 
 ## Module-only workflows
 

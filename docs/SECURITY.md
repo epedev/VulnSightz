@@ -8,7 +8,7 @@ VulnSight is an **educational** scanner. Default operation is restricted to loop
 - Do **not** treat crawler output as permission to attack those URLs.
 - Prefer an authorized `--project` file that records who authorized the test.
 - Use `--allow-external` / `allow_private_network` only for explicitly authorized assessments.
-- Until every detector shares the crawler/XSS scoped session, authorized non-loopback scans still run **recon and XSS only** for SQLi, command injection, access control, and misconfig (those modules validate loopback bases).
+- Authorized non-loopback scans require `--allow-external` or `allow_private_network`. All detectors use `ScopedSession` and re-validate every redirect hop.
 
 ## Optional bundled training lab
 

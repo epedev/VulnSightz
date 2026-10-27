@@ -14,6 +14,9 @@ from urllib.parse import urlparse
 
 import requests
 
+from vulnsight.scoped_http import ScopePolicy, ScopedSession
+from vulnsight.scope import ScopeError
+
 from scanner.models import (
     Confidence,
     Finding,
@@ -27,40 +30,42 @@ PROFILE_RE = re.compile(r"/profile/(\d+)/?$", re.IGNORECASE)
 ADMIN_HINTS = ("/admin", "/administrator", "/dashboard/admin", "/manage")
 
 
-def _validate_local_url(base_url: str) -> None:
-    parsed = urlparse(base_url)
-    host = (parsed.hostname or "").lower()
-    if (
-        parsed.scheme not in {"http", "https"}
-        or host not in {"127.0.0.1", "localhost", "::1"}
-        or parsed.username is not None
-        or parsed.password is not None
-    ):
-        raise ValueError("Testing is restricted to the local HTTP lab.")
 
-
-def login(base_url: str, username: str, password: str, login_path: str = "/login") -> requests.Session:
-    """Authenticate against the local lab app and return the resulting session."""
-    _validate_local_url(base_url)
-    session = requests.Session()
+def login(
+    base_url: str,
+    username: str,
+    password: str,
+    login_path: str = "/login",
+    *,
+    allow_private: bool = False,
+    allow_external: bool = False,
+) -> ScopedSession:
+    """Authenticate against the local lab app and return a scoped session."""
+    session = ScopedSession.for_target(
+        base_url, allow_private=allow_private, allow_external=allow_external
+    )
     session.post(
         base_url.rstrip("/") + login_path,
         data={"username": username, "password": password},
         timeout=5,
+        allow_redirects=False,
     )
     return session
 
 
 def check_idor(
     base_url: str,
-    authenticated_session: requests.Session,
+    authenticated_session: ScopedSession | requests.Session,
     own_user_id: int,
     probe_ids: list[int],
     *,
     profile_template: str = "/profile/{id}",
 ) -> ScanResult:
     """IDOR check via direct object ID substitution on profile resources."""
-    _validate_local_url(base_url)
+    try:
+        ScopePolicy.for_target(base_url)
+    except ScopeError as exc:
+        raise ValueError(str(exc)) from exc
     result = ScanResult(module="access_control")
 
     for pid in probe_ids:
@@ -139,11 +144,14 @@ def check_idor(
 
 def check_broken_access_control(
     base_url: str,
-    low_privilege_session: requests.Session,
+    low_privilege_session: ScopedSession | requests.Session,
     admin_path: str = "/admin",
 ) -> ScanResult:
     """Broken access control check against a privileged path."""
-    _validate_local_url(base_url)
+    try:
+        ScopePolicy.for_target(base_url)
+    except ScopeError as exc:
+        raise ValueError(str(exc)) from exc
     result = ScanResult(module="access_control")
     if not admin_path.startswith("/"):
         admin_path = "/" + admin_path
@@ -278,11 +286,14 @@ def check_unauthenticated_access(
     profile_template: str,
     probe_ids: list[int],
     admin_paths: list[str],
+    allow_private: bool = False,
+    allow_external: bool = False,
 ) -> ScanResult:
     """Probe IDOR/BAC without credentials when login seeds are unavailable."""
-    _validate_local_url(base_url)
     result = ScanResult(module="access_control")
-    session = requests.Session()
+    session = ScopedSession.for_target(
+        base_url, allow_private=allow_private, allow_external=allow_external
+    )
     requests_sent = 0
     bodies: dict[int, str] = {}
 
@@ -392,23 +403,46 @@ def check_local_target(
     *,
     users: list[tuple[str, str]] | None = None,
     login_path: str = "/login",
+    allow_private: bool = False,
+    allow_external: bool = False,
 ) -> ScanResult:
     """Full access-control check against an authorized local target."""
-    _validate_local_url(base_url)
     combined = ScanResult(module="access_control")
+    # Fail closed on unauthorized bases before probing.
+    try:
+        ScopePolicy.for_target(
+            base_url, allow_private=allow_private, allow_external=allow_external
+        )
+    except ScopeError as exc:
+        raise ValueError(str(exc)) from exc
+
     profile_template, probe_ids, admin_paths = _discover_from_crawl(base_url, crawl_map)
     users = users or [("alice", "alice123"), ("bob", "bobpass")]
 
     authenticated = False
     try:
         primary_user, primary_pass = users[0]
-        alice_session = login(base_url, primary_user, primary_pass, login_path=login_path)
+        alice_session = login(
+            base_url,
+            primary_user,
+            primary_pass,
+            login_path=login_path,
+            allow_private=allow_private,
+            allow_external=allow_external,
+        )
         if len(users) > 1:
-            bob_session = login(base_url, users[1][0], users[1][1], login_path=login_path)
+            bob_session = login(
+                base_url,
+                users[1][0],
+                users[1][1],
+                login_path=login_path,
+                allow_private=allow_private,
+                allow_external=allow_external,
+            )
         else:
             bob_session = None
         authenticated = True
-    except requests.RequestException as exc:
+    except (requests.RequestException, ScopeError) as exc:
         combined.errors.append(f"Login failed during access_control setup: {exc}")
         alice_session = None
         bob_session = None
@@ -453,6 +487,8 @@ def check_local_target(
         profile_template=profile_template,
         probe_ids=probe_ids,
         admin_paths=admin_paths,
+        allow_private=allow_private,
+        allow_external=allow_external,
     )
     # Avoid duplicating the exact same URL+title pairs.
     existing = set()

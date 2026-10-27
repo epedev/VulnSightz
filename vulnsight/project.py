@@ -67,6 +67,7 @@ class ProjectConfig:
             timeout=self.timeout,
             max_requests=self.max_requests,
             allow_external=allow_external,
+            allow_private_network=self.allow_private_network or allow_external,
             allow_loopback=True,
             verbose=verbose,
             enable_stored_xss=self.enable_stored_xss,

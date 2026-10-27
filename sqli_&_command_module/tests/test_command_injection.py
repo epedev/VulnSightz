@@ -5,13 +5,13 @@ from command_injection.detector import check_local_target
 
 
 class TestCommandInjection(unittest.TestCase):
-    @patch("command_injection.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_detects_output_marker(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
 
-        baseline = Mock(status_code=200, text="127.0.0.1 ping output")
-        test = Mock(status_code=200, text="ping output REDOPS_CMD_TEST")
+        baseline = Mock(status_code=200, text="127.0.0.1 ping output", url="http://127.0.0.1:5001/ping", is_redirect=False, headers={})
+        test = Mock(status_code=200, text="ping output REDOPS_CMD_TEST", url="http://127.0.0.1:5001/ping", is_redirect=False, headers={})
         client.post.side_effect = [baseline, test]
 
         result = check_local_target("http://127.0.0.1:5001")
@@ -30,13 +30,13 @@ class TestCommandInjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             check_local_target("http://example.com")
 
-    @patch("command_injection.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_no_finding_when_marker_is_absent(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
 
-        baseline = Mock(status_code=200, text="normal ping output")
-        test = Mock(status_code=200, text="normal ping output")
+        baseline = Mock(status_code=200, text="normal ping output", url="http://127.0.0.1:5001/ping", is_redirect=False, headers={})
+        test = Mock(status_code=200, text="normal ping output", url="http://127.0.0.1:5001/ping", is_redirect=False, headers={})
         client.post.side_effect = [baseline, test]
 
         result = check_local_target("http://127.0.0.1:5001")

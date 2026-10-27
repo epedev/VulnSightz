@@ -8,6 +8,9 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 
+from vulnsight.scoped_http import ScopePolicy, ScopedSession
+from vulnsight.scope import ScopeError
+
 from scanner.models import (
     Confidence,
     Finding,
@@ -38,17 +41,6 @@ REDIRECT_PARAMS = ("next", "url", "redirect", "return", "return_url", "continue"
 SSRF_PARAMS = ("url", "uri", "fetch", "feed", "proxy", "target_url", "page_url", "webhook", "callback")
 DISCLOSURE_HEADERS = ("Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version")
 
-
-def _validate_local_url(base_url: str) -> None:
-    parsed = urlparse(base_url)
-    host = (parsed.hostname or "").lower()
-    if (
-        parsed.scheme not in {"http", "https"}
-        or host not in {"127.0.0.1", "localhost", "::1"}
-        or parsed.username is not None
-        or parsed.password is not None
-    ):
-        raise ValueError("Testing is restricted to the local HTTP lab.")
 
 
 def _finding(**kwargs: Any) -> Finding:
@@ -557,7 +549,7 @@ def _check_verbose_errors(
         return findings
     probe = base_url.rstrip("/") + "/vulnsight-exception-probe-%s" % "zz9"
     try:
-        resp = client.get(probe, timeout=timeout, allow_redirects=True)
+        resp = client.get(probe, timeout=timeout, allow_redirects=False)
         budget[0] -= 1
     except requests.RequestException:
         budget[0] -= 1
@@ -631,16 +623,25 @@ def check_local_target(
     *,
     timeout: float = 5.0,
     max_requests: int = 20,
+    allow_private: bool = False,
+    allow_external: bool = False,
 ) -> ScanResult:
     """Run security-hygiene checks against an authorized local target."""
-    _validate_local_url(base_url)
     result = ScanResult(module="misconfig")
     base = base_url.rstrip("/") + "/"
     budget = [max(1, max_requests)]
     requests_sent = 0
 
     try:
-        with requests.Session() as client:
+        scoped = ScopedSession.for_target(
+            base_url, allow_private=allow_private, allow_external=allow_external
+        )
+    except ScopeError as exc:
+        raise ValueError(str(exc)) from exc
+
+    try:
+        with scoped as client:
+            # S-02: do not silently follow redirects off-origin; ScopedSession re-checks hops.
             resp = client.get(base, timeout=timeout, allow_redirects=True)
             requests_sent += 1
             budget[0] -= 1

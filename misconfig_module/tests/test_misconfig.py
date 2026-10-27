@@ -6,10 +6,10 @@ from misconfig.detector import check_local_target
 
 
 class TestMisconfig(unittest.TestCase):
-    @patch("misconfig.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_detects_missing_security_headers(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
         resp = Mock()
         resp.url = "http://127.0.0.1:5001/"
         resp.headers = {"Content-Type": "text/html"}
@@ -23,10 +23,10 @@ class TestMisconfig(unittest.TestCase):
         self.assertTrue(any("Content-Security-Policy" in t for t in titles))
         self.assertTrue(any("X-Frame-Options" in t for t in titles))
 
-    @patch("misconfig.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_csrf_form_without_token(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
         resp = Mock()
         resp.url = "http://127.0.0.1:5001/"
         resp.headers = {
@@ -55,10 +55,10 @@ class TestMisconfig(unittest.TestCase):
         result = check_local_target("http://127.0.0.1:5001", crawl_map=crawl)
         self.assertTrue(any("CSRF" in f.title for f in result.findings))
 
-    @patch("misconfig.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_open_redirect_from_crawl_link(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
         home = Mock()
         home.url = "http://127.0.0.1:5001/"
         home.headers = {
@@ -96,10 +96,10 @@ class TestMisconfig(unittest.TestCase):
         result = check_local_target("http://127.0.0.1:5001", crawl_map=crawl)
         self.assertTrue(any("Open redirect" in f.title for f in result.findings))
 
-    @patch("misconfig.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_tech_disclosure_and_cleartext_login(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
         resp = Mock()
         resp.url = "http://127.0.0.1:5001/"
         resp.headers = {
@@ -137,10 +137,10 @@ class TestMisconfig(unittest.TestCase):
         self.assertTrue(any(o and o.startswith("A03:2025") for o in owasps))
         self.assertTrue(any(o and o.startswith("A04:2025") for o in owasps))
 
-    @patch("misconfig.detector.requests.Session")
+    @patch("vulnsight.scoped_http.requests.Session")
     def test_ssrf_candidate_signal(self, mock_session):
         client = Mock()
-        mock_session.return_value.__enter__.return_value = client
+        mock_session.return_value = client
         home = Mock()
         home.url = "http://127.0.0.1:5001/"
         home.headers = {
