@@ -20,10 +20,11 @@ class TestCommandInjection(unittest.TestCase):
         finding = result.findings[0]
         self.assertEqual(finding.cwe, "CWE-78")
         self.assertEqual(result.stats["requests_sent"], 2)
-        self.assertTrue(finding.evidence.get("lab_simulation"))
-        self.assertFalse(finding.evidence.get("os_shell_executed"))
+        self.assertNotIn("lab_simulation", finding.evidence)
+        self.assertNotIn("os_shell_executed", finding.evidence)
+        self.assertEqual(finding.confidence, "medium")
         self.assertEqual(finding.verification_status, "probable")
-        self.assertIn("simulat", finding.description.lower())
+        self.assertIn("consistent with shell", finding.description.lower())
 
     def test_rejects_non_local_target(self):
         with self.assertRaises(ValueError):

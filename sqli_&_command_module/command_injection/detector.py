@@ -79,22 +79,20 @@ def _build_finding(
             "marker_observed": True,
             "baseline_status": baseline_status,
             "test_status": test_status,
-            "lab_simulation": True,
-            "os_shell_executed": False,
             "note": (
-                "A unique marker injected through a command-like parameter appeared "
-                "in the response. Treat this as evidence of an unsafe concatenation "
-                "pattern, not as proof that the host executed operating-system commands."
+                "Marker observed in the response, consistent with shell execution "
+                "or reflection of the injected input. Confirm with a non-reflective "
+                "token before treating this as proven OS command execution."
             ),
         },
         detection_method="output_marker",
-        confidence=Confidence.HIGH.value,
+        confidence=Confidence.MEDIUM.value,
         severity=Severity.HIGH.value,
         verification_status=VerificationStatus.PROBABLE.value,
         http_status=test_status,
         description=(
-            "A unique marker injected through a command-like parameter appeared in "
-            "the response, indicating an unsafe sink pattern."
+            "Marker observed in the response after injecting a command-like payload; "
+            "consistent with shell execution but not yet proven by a non-reflective token."
         ),
         impact=(
             "In a real application that concatenates user input into a shell "
