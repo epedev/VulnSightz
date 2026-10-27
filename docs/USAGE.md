@@ -61,13 +61,14 @@ Useful `scan` flags:
 | `--crawl-map PATH` | Reuse a crawl map (skips recon) |
 | `--marker-only` | XSS marker-only mode |
 | `--browser-verify` | Optional Playwright confirmation |
-| `--allow-external` | Permit non-loopback targets (explicit) |
+| `--allow-external` | Permit non-loopback targets (explicit; see coverage note below) |
 | `--no-color` | Disable terminal colors |
 | `--max-pages` / `--max-requests` / `--timeout` | Budgets |
 
 ### Coverage notes
 
 - **SQLi, command injection, and access control** are tuned to the training lab’s common routes and accounts (`/login`, `/ping`, `/profile/{id}`, `/admin`, alice/bob). Other authorized sites still get crawl-map-driven probes, but expect partial coverage unless you match those patterns.
+- **`--allow-external` / `allow_private_network`:** the crawler and XSS module honor project scope for non-loopback targets. Until a shared scoped HTTP session is used everywhere, SQLi, command injection, access control, and misconfig still refuse non-loopback bases — so an authorized external scan currently runs **recon and XSS only** for those modules’ contribution.
 
 ## Module-only workflows
 
