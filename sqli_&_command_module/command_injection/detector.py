@@ -25,7 +25,9 @@ from scanner.models import (
     VerificationStatus,
 )
 
-MARKER = "REDOPS_CMD_TEST"
+# Token must NOT appear verbatim in the request; shell arithmetic proves interpretation.
+EXPECTED_TOKEN = "VULNSIGHT4011"  # printf %s%s VULNSIGHT $((1337*3))
+MARKER = EXPECTED_TOKEN  # backwards-compatible evidence key value
 PREFERRED_PARAMS = {
     "host",
     "ip",
@@ -114,9 +116,9 @@ def _probe_endpoint(
     method = method.upper()
     fields = field_names or [parameter]
     payloads = payloads or (
-        ("127.0.0.1", f"127.0.0.1; printf {MARKER}"),
-        ("127.0.0.1", f"127.0.0.1|echo {MARKER}"),
-        ("x", f"x;printf {MARKER}"),
+        ("127.0.0.1", "127.0.0.1; printf %s%s VULNSIGHT $((1337*3))"),
+        ("127.0.0.1", "127.0.0.1; printf %s%s VULNSIGHT $((4000+11))"),
+        ("x", "x;printf %s%s VULNSIGHT $((1337*3))"),
     )
 
     last_outcome: TestOutcome | None = None
@@ -305,7 +307,9 @@ def check_local_target(
                 parameter="host",
                 field_names=["host"],
                 timeout=timeout,
-                payloads=(("127.0.0.1", f"127.0.0.1; printf {MARKER}"),),
+                payloads=(
+                    ("127.0.0.1", "127.0.0.1; printf %s%s VULNSIGHT $((1337*3))"),
+                ),
             )
             requests_sent += 2
             if finding:

@@ -11,7 +11,7 @@ class TestCommandInjection(unittest.TestCase):
         mock_session.return_value = client
 
         baseline = Mock(status_code=200, text="127.0.0.1 ping output", url="http://127.0.0.1:5001/ping", is_redirect=False, headers={})
-        test = Mock(status_code=200, text="ping output REDOPS_CMD_TEST", url="http://127.0.0.1:5001/ping", is_redirect=False, headers={})
+        test = Mock(status_code=200, text="ping output VULNSIGHT4011", url="http://127.0.0.1:5001/ping", is_redirect=False, headers={})
         client.post.side_effect = [baseline, test]
 
         result = check_local_target("http://127.0.0.1:5001")
