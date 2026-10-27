@@ -4,7 +4,7 @@
 
 Only scan systems you own or have explicit written permission to test. VulnSight defaults to loopback (`127.0.0.1` / `localhost` / `::1`). Crawler-discovered URLs are **not** authorization.
 
-VulnSight does not include a vulnerable target application. Start your own prepared local website first.
+VulnSight ships an optional training lab in `vulnerable-target-app/`. You may also bring your own authorized local website.
 
 ## Authorized project scan (recommended)
 

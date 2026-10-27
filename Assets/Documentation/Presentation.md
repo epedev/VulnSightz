@@ -131,7 +131,7 @@ A zero count means no matching finding within the configured scope. It does not 
 - **Crawler reach**: Unlinked, authenticated-only, or dynamic routes may never be tested.
 - **Access control**: The scanner cannot infer every intended authorization rule.
 - **Partial runs**: Skipped or failed modules reduce coverage and are disclosed in the report.
-- **No bundled target**: Operators supply and configure their own authorized test application.
+- **Optional bundled lab**: `vulnerable-target-app/` is included for training; operators may also bring their own authorized target.
 
 ---
 

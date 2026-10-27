@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — Optional training lab restored in docs
+
+- Document `vulnerable-target-app/` as an optional bundled training lab (bring-your-own targets still supported)
+- Align SECURITY, USAGE, ARCHITECTURE, DEMO_RUNBOOK, VULNERABLE_TARGET, CONTRIBUTING, PROJECT, fixtures, XSS docs, interactive docs, and graduation documents with that truth
+- Add `scripts/check_docs_phrases.py` to fail CI on regressing "does not ship / no bundled target" wording
+
 ## 0.2.0 — Academic hardening features
 
 - Add `misconfig_module` (security headers, cookie flags, CSRF form candidates, open redirect)

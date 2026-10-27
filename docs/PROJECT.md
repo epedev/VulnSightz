@@ -38,6 +38,6 @@ VulnSight demonstrates a complete, ethically constrained scanning pipeline suita
 
 ## Out of scope
 
-- Bundled deliberately vulnerable target application
+- Production or internet-facing deployment of the optional training lab
 - Unauthorized or external scanning without explicit operator consent
 - Guaranteed complete coverage of all vulnerability classes

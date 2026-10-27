@@ -1,8 +1,8 @@
 # Vulnerable target
 
-VulnSight does **not** ship a deliberately vulnerable web application.
+VulnSight ships an **optional** deliberately vulnerable training lab in `vulnerable-target-app/`. Bring-your-own authorized targets are also supported.
 
-Bring your own authorized local target and point the scanner at it:
+Point the scanner at the lab or your own target:
 
 ```bash
 vulnsight init-project -o myproject.json --target http://127.0.0.1:PORT

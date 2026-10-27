@@ -1,6 +1,6 @@
 # Architecture
 
-VulnSight is a modular monorepo integrated by a thin CLI/orchestrator. It scans an operator-provided authorized website; it does not ship a vulnerable target app.
+VulnSight is a modular monorepo integrated by a thin CLI/orchestrator. It scans authorized websites: use the optional bundled lab in `vulnerable-target-app/` or bring your own target.
 
 ```mermaid
 flowchart LR
