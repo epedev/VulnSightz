@@ -1,0 +1,17 @@
+{
+  "target": "http://127.0.0.1:5001",
+  "notes": "Golden expectations for vulnerable-target-app/. Integration CI should assert true positives; known false negatives are listed separately.",
+  "true_positives": [
+    {"route": "/login", "parameter": "username", "class": "sqli", "cwe": "CWE-89"},
+    {"route": "/search", "parameter": "q", "class": "xss_reflected", "cwe": "CWE-79"},
+    {"route": "/comments", "parameter": "comment", "class": "xss_stored", "cwe": "CWE-79"},
+    {"route": "/profile/{id}", "parameter": "id", "class": "idor", "cwe": "CWE-639"},
+    {"route": "/admin", "parameter": "", "class": "broken_access_control", "cwe": "CWE-284"},
+    {"route": "/ping", "parameter": "host", "class": "command_injection", "cwe": "CWE-78"}
+  ],
+  "negative_controls": [
+    {"route": "/", "expect": "no_injection_findings"},
+    {"route": "/robots.txt", "expect": "recon_only"}
+  ],
+  "known_false_negatives": []
+}
