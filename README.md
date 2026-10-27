@@ -4,7 +4,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-0f4c5c?style=flat-square)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-555555?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-pytest-0f4c5c?style=flat-square)](tests/)
+[![CI](https://github.com/epedev/VulnSightz/actions/workflows/ci.yml/badge.svg)](https://github.com/epedev/VulnSightz/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.2.1-1faa9a?style=flat-square)](CHANGELOG.md)
 [![Docs](https://img.shields.io/badge/docs-interactive-1faa9a?style=flat-square)](https://epedev.github.io/VulnSightz/)
 [![Repo](https://img.shields.io/badge/github-epedev%2FVulnSightz-0f4c5c?style=flat-square)](https://github.com/epedev/VulnSightz)
