@@ -30,6 +30,14 @@ _HEADER_RE = re.compile(
 _QUERY_RE = re.compile(
     r"(?i)([?&](?:password|passwd|token|secret|api_key|access_token)=)([^&]*)"
 )
+# Body-style form fields (including first field with no leading ?/&)
+_BODY_RE = re.compile(
+    r"(?i)(?:^|[&\s])((?:password|passwd|token|secret|api_key|access_token)=)([^&\s]*)"
+)
+# JSON object secrets
+_JSON_RE = re.compile(
+    r'(?i)("(?:password|passwd|token|secret|api_key|access_token)"\s*:\s*)"(?:\\.|[^"\\])*"'
+)
 
 
 def redact_text(text: str) -> str:
@@ -37,6 +45,8 @@ def redact_text(text: str) -> str:
         return text
     text = _HEADER_RE.sub(lambda m: f"{m.group(1)}: {REDACT}", text)
     text = _QUERY_RE.sub(lambda m: f"{m.group(1)}{REDACT}", text)
+    text = _BODY_RE.sub(lambda m: f"{m.group(1)}{REDACT}", text)
+    text = _JSON_RE.sub(lambda m: f'{m.group(1)}"{REDACT}"', text)
     return text
 
 
