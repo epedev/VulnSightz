@@ -40,6 +40,7 @@ VulnSight is a Group 3 graduation project: an ethically constrained scanning pip
 - **Reporting:** HTML, Markdown, PDF, and JSON output.
 - **Comparison mode:** `vulnsight compare` contrasts a vulnerable build against a secure baseline.
 - **Lab-first defaults:** loopback targets only, with explicit opt-in for anything else.
+- **Lab-tuned detectors:** SQLi, command injection, and access control favor common training-lab routes (`/login`, `/ping`, `/profile/{id}`, `/admin`) and lab accounts; other sites get crawl-map-driven partial coverage.
 - **Interactive documentation:** `vulnsight docs`.
 
 ## Pipeline

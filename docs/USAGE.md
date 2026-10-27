@@ -65,6 +65,10 @@ Useful `scan` flags:
 | `--no-color` | Disable terminal colors |
 | `--max-pages` / `--max-requests` / `--timeout` | Budgets |
 
+### Coverage notes
+
+- **SQLi, command injection, and access control** are tuned to the training lab’s common routes and accounts (`/login`, `/ping`, `/profile/{id}`, `/admin`, alice/bob). Other authorized sites still get crawl-map-driven probes, but expect partial coverage unless you match those patterns.
+
 ## Module-only workflows
 
 Member modules remain independently runnable; see each module README under `Crawler/`, `xss_module/`, `sqli_&_command_module/`, `access_control_module/`, and `reporting_module/`.

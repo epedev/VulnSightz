@@ -51,10 +51,13 @@ Crawler discovery does **not** expand authorization beyond the project/target sc
 | Area | False positive risk | False negative risk |
 |------|---------------------|---------------------|
 | XSS marker reflection | Encoded/inert reflections may still be candidates | Complex DOM sinks may be missed |
-| SQLi auth bypass | Custom login UX may not match heuristics | Non-login SQLi sinks may be missed |
+| SQLi auth bypass | Custom login UX may not match heuristics; success oracle defaults to redirect `/` | Non-login SQLi sinks may be missed |
+| Command injection | Reflected markers without shell execution | Non-`/ping` sinks without cmd-like params |
 | CSRF form inspection | Header-based CSRF may look tokenless | JS-only forms may be invisible to crawler |
 | Security headers | CDN may add headers on other routes | Headers on non-home routes only |
-| Access control | Public profiles may look like IDOR | Hidden privileged APIs not linked |
+| Access control | Public profiles may look like IDOR; uses lab accounts alice/bob by default | Hidden privileged APIs not linked; non-lab auth models |
+
+SQLi, command injection, and access control are **lab-tuned** (common routes and accounts). Bring-your-own targets get crawl-map-driven partial coverage unless routes match.
 
 ## Residual risk statement
 
